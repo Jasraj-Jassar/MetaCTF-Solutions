@@ -280,3 +280,5 @@ Abashed Confessions
 ![image.png](images/image%2012.png)
 
 We also have a transcript of the letter [here](https://metaproblems.com/e50c3885d7512ce80354b2583d204365/letter_transcript.txt).
+
+Will Continue Soon :) .
