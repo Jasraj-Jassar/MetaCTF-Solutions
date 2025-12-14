@@ -6,13 +6,7 @@ CTFs are amazing!
 
 [**Direct Login](https://compete.metactf.com/289/problems#problem2) - Question** 
 
-First Question:
-
-Take a look at [ConnectWind's internal employee portal](https://metaproblems.com/71c5b42eb77639d5224be5589123de30/). In addition to company policies & HR information, I heard it also stores flags.
-
-Can you access the protected employee portal without knowing the password and steal the flag?
-
-This challenge is from the February 2024 Flash CTF. It was first solved 30 seconds into the competition by `NickC`. 62.4% of active users solved it during the competition.
+<img width="1783" height="497" alt="image" src="https://github.com/user-attachments/assets/e4c6b889-c60d-4844-8817-d5fd1d4c0968" />
 
 Solution:
 
