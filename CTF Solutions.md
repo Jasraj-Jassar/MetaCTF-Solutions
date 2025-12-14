@@ -2,7 +2,7 @@
 
 CTFs are amazing!
 
-# Solutions
+# Here are my Solutions to MetaCTF challenges 
 
 [**Direct Login](https://compete.metactf.com/289/problems#problem2) - Question** 
 
@@ -590,4 +590,27 @@ Reveals the flag:
 ---
 
 
+<img width="1748" height="633" alt="image" src="https://github.com/user-attachments/assets/9b899760-44fa-4a31-abf0-ec628c528149" />
+
+Solution:
+
+SqlInjection Basics Resource: 
+https://www.youtube.com/watch?v=2OPVViV-GQk
+
+So using that sql trick
+
+Username = jim404' OR '1'='1
+
+<img width="1648" height="816" alt="image" src="https://github.com/user-attachments/assets/72b3995e-abeb-4881-9fb6-04020c7337c6" />
+
+The flag:
+<img width="2061" height="888" alt="image" src="https://github.com/user-attachments/assets/32139c6e-d1b4-45e5-ab0d-314226434854" />
+
+
+---
+
+---
+
+
 Will continue soon! 
+
