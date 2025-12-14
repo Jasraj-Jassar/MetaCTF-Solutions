@@ -1,4 +1,8 @@
-<img width="854" height="341" alt="image" src="https://github.com/user-attachments/assets/065886cf-aa39-435c-9d0c-aa228f1bd414" /># Solutions
+<img width="854" height="341" alt="image" src="https://github.com/user-attachments/assets/065886cf-aa39-435c-9d0c-aa228f1bd414" />
+
+CTFs are amazing!
+
+# Solutions
 
 [**Direct Login](https://compete.metactf.com/289/problems#problem2) - Question** 
 
@@ -12,33 +16,6 @@ This challenge is from the February 2024 Flash CTF. It was first solved 30 secon
 
 Solution:
 
-Tried the following for problem 1: - Failed
-
-Identify potential hidden or unlisted endpoints under the URL:
-
-`https://metaproblems.com/71c5b42eb77639d5224be5589123de30/`
-
-
-1. Search Engine Indexing (Passive):
-    - Used Google dorking:
-        
-        `site:metaproblems.com inurl:71c5b42eb77639d5224be5589123de30`
-        
-    - Result: No additional paths discovered.
-2. Directory Fuzzing (Active):
-    - Tools: `ffuf`, `gobuster`, `dirb`, `dirbuster`
-    - Technique: Brute-force common paths using known wordlists (`SecLists`)
-    - Example paths tested: `employee_portal.php`, `admin/`, `login/`
-
-Reason why it failed:
-
-- No passive method reveals hidden endpoints unless already exposed or indexed.
-- Brute-force (directory fuzzing) is the only reliable method to discover unlisted paths.
-
----
-
-Second Try - Success
-
 Go to inspect Elemets and see the script if the password is sucessful it redirects 
 
 ![image.png](images/image.png)
@@ -47,9 +24,11 @@ window.location.href = "./employee_portal.php";
 
 Meaning adding /employee_portal.php to the URL takes you there. 
 
+
 ---
 
 ---
+
 
 Camping Adventure
 
@@ -57,9 +36,11 @@ Camping Adventure
 
 Solution Perform Google Image Search.
 
+
 ---
 
 ---
+
 
 Architecture Astronaut
 
@@ -89,9 +70,11 @@ The executable was compiled for the Tensilica Xtensa architecture.
 
 Flag: xtensa
 
+
 ---
 
 ---
+
 
 [**Anonymoose**](https://compete.metactf.com/289/problems#problem29)
 
@@ -105,9 +88,11 @@ Downloaded the PDF - Viewed its MetaData using the following website
 [https://www.metadata2go.com/view-metadata](https://www.metadata2go.com/view-metadata)
 ```
 
+
 ---
 
 ---
+
 
 Wheel of Mystery
 
@@ -117,6 +102,7 @@ Wheel of Mystery
 
 Tried allighning the cyper wheel with 3 words  }AB  didnt work
 
+```
 R - {
 K - Y
 P - W
@@ -136,6 +122,7 @@ Z - T
 Z - T
 J - C
 T - X
+```
 
 {YWOUWNE DAY YCZUTTCX
 
@@ -153,9 +140,11 @@ Awnser =
 
 METACTF{WHEELYCOOL}
 
+
 ---
 
 ---
+
 
 [**Cracking The Javashop**](https://compete.metactf.com/289/problems#problem39)
 
@@ -167,9 +156,11 @@ Went to the Script and found the Code
 
 ![image.png](images/image%207.png)
 
+
 ---
 
 ---
+
 
 Stack Smashers
 
@@ -183,9 +174,11 @@ Solution Just added more than 16 char the buffer overflow and got the flag.
 
 Learn more about buffer overflows from the classic paper [Smashing the Stack for Fun and Profit](http://phrack.org/issues/49/14.html) by Aleph One.
 
+
 ---
 
 ---
+
 
 START FROM HERE - [https://compete.metactf.com/289/problems](https://compete.metactf.com/289/problems) 
 
@@ -222,15 +215,15 @@ mshta http://nonmaliciouscaptcha.metaproblems.com/MetaCTF{F4k3_c4pTch@s_ruN_m4lw
 
 It is a Windows **built-in executable** (`mshta.exe`) used to run **HTML Applications (HTA files)**, which are HTML pages with the ability to execute **scripts (like VBScript or JavaScript)** with full system access — **similar to .exe files**.
 
----
-
 ### In cybersecurity or CTF context:
 
 - `mshta` is often **used by malware** or **in Capture The Flag (CTF) challenges** to execute remote or local malicious scripts.
 
+
 ---
 
 ---
+
 
 Slithering Security
 
@@ -253,9 +246,11 @@ Was given this string in HEX
 
 Flag Captured!
 
+
 ---
 
 ---
+
 
 Abashed Confessions
 
@@ -267,9 +262,11 @@ We also have a transcript of the letter [here](https://metaproblems.com/e50c388
 
 It was just a atbash-cipher and decode it to get the flag. :)
 
+
 ---
 
 ---
+
 
 <img width="1841" height="646" alt="image" src="https://github.com/user-attachments/assets/572c16a0-7efb-4f64-8e25-c92bf941c314" />
 
@@ -278,9 +275,11 @@ Just copy the “Times Borrowed” column into CyberChef, then apply the From De
 
 <img width="1743" height="807" alt="image" src="https://github.com/user-attachments/assets/a7ab5564-49dd-4985-b6c3-529993207a87" />
 
+
 ---
 
 ---
+
 
 <img width="1465" height="487" alt="image" src="https://github.com/user-attachments/assets/b9287cca-4d91-4269-bd1b-b0ad624af9fb" />
 
@@ -289,9 +288,11 @@ Using Cokkie Editor extention on my browser, found the flag.
 
 <img width="2155" height="1031" alt="image" src="https://github.com/user-attachments/assets/35b9889c-b9d5-47c0-85b0-8e2892a98f6c" />
 
+
 ---
 
 ---
+
 
 <img width="1796" height="885" alt="image" src="https://github.com/user-attachments/assets/8dd674f9-cbaa-4585-80ad-1a860e366036" />
 
@@ -302,9 +303,11 @@ https://www.dcode.fr/keyboard-shift-cipher
 
 <img width="1326" height="588" alt="image" src="https://github.com/user-attachments/assets/a5fd6017-721f-4b1f-b5ad-9bc9eaa226ca" />
 
+
 ---
 
 ---
+
 
 <img width="1787" height="761" alt="image" src="https://github.com/user-attachments/assets/d1a59330-f839-4624-95bc-a1918be7d5c4" />
 
@@ -313,9 +316,11 @@ Stoped  the container to save their resources after I found the flag. - Good Hab
 Solution:
 <img width="1305" height="696" alt="image" src="https://github.com/user-attachments/assets/f80c5927-b946-41cf-b997-8dc491265038" />
 
+
 ---
 
 ---
+
 
 <img width="1755" height="626" alt="image" src="https://github.com/user-attachments/assets/d24c553b-9a89-492f-a650-5f274682e8a2" />
 
@@ -330,9 +335,11 @@ Used that link to attain the flag. :)
 
 <img width="2396" height="1095" alt="image" src="https://github.com/user-attachments/assets/2f0ec5cc-31ee-434c-8aea-a65f16631a9b" />
 
+
 ---
 
 ---
+
 
 <img width="1802" height="777" alt="image" src="https://github.com/user-attachments/assets/7493d6b1-eb06-4daa-a995-a6ef57c2dba1" />
 
@@ -346,9 +353,11 @@ link to the wikipedia = https://wikipedia.org/wiki/Pigpen_cipher
 
 Easy decoding done manually to attain the flag = METACTF{COMICALLYDECODED}
 
+
 ---
 
 ---
+
 
 <img width="1767" height="646" alt="image" src="https://github.com/user-attachments/assets/15e7f848-8c56-4798-a4a2-3262e129eef8" />
 
@@ -358,9 +367,11 @@ CyberCheif Time :) - i love this tool...
 
 <img width="1318" height="503" alt="image" src="https://github.com/user-attachments/assets/469e3a9f-2401-4d66-bda0-ac86f3e0c70f" />
 
+
 ---
 
 ---
+
 
 <img width="1777" height="521" alt="image" src="https://github.com/user-attachments/assets/6b54acb8-9f0b-48d3-b1b1-dde02e48a6e9" />
 
@@ -370,9 +381,11 @@ Looks like Rot13 encryption, CyberrrrCheifff Timeeee XD
 
 <img width="1160" height="562" alt="image" src="https://github.com/user-attachments/assets/f1b183fe-bd25-4186-b1fb-dfb349e61e10" />
 
+
 ---
 
 ---
+
 
 <img width="2180" height="708" alt="image" src="https://github.com/user-attachments/assets/187e980c-be54-46eb-89f3-77770870a857" />
 
@@ -388,6 +401,7 @@ looking at the file names, found the flag.
 
 ---
 
+
 <img width="2102" height="715" alt="image" src="https://github.com/user-attachments/assets/9a381afb-a04c-4a49-83d0-eea22a883c1c" />
 
 Solution:
@@ -398,9 +412,11 @@ we find the flag as directory names.
 
 <img width="982" height="502" alt="image" src="https://github.com/user-attachments/assets/c3012888-ab58-44ab-a8c6-01b65fe8d816" />
 
+
 ---
 
 ---
+
 
 <img width="2101" height="763" alt="image" src="https://github.com/user-attachments/assets/3f1f5655-5ef9-4bc2-9b87-f9f3730c1a81" />
 
@@ -417,6 +433,7 @@ therefore i tried from 1 to 13 and 13 number webpage link thingi had the flag...
 
 ---
 
+
 <img width="2185" height="732" alt="image" src="https://github.com/user-attachments/assets/bfcdc5b5-f652-4255-a20a-adfe6e03dbe3" />
 
 Solution:
@@ -426,6 +443,7 @@ This one is tricky but heres the python code i used to decrypt it
 """The script recovers an unknown 8-byte XOR key using the known PNG header, 
 then XORs the entire encrypted file with that key to restore the original image."""
 
+```
 
 from pathlib import Path
 
@@ -455,13 +473,17 @@ Write decrypted PNG
 dec_path.write_bytes(dec)
 print("Wrote decrypted PNG to:", dec_path)
 
+```
+
 Found the flag:
 
 <img width="1645" height="640" alt="image" src="https://github.com/user-attachments/assets/bf4d24a7-14e9-4cab-b918-322a2785c0b4" />
 
+
 ---
 
 ---
+
 
 <img width="2116" height="807" alt="image" src="https://github.com/user-attachments/assets/13781023-000c-480e-b05a-d480f7a237df" />
 
@@ -474,9 +496,11 @@ Then using Cyber cheif to convert the hex (make sure png header is there) to att
 
 <img width="1936" height="905" alt="image" src="https://github.com/user-attachments/assets/8829d8d9-67b9-4095-8847-d6daf5dd5a19" />
 
+
 ---
 
 ---
+
 
 <img width="2122" height="781" alt="image" src="https://github.com/user-attachments/assets/7b75ca20-a8f0-4193-bb2b-a62c11b2ef79" />
 
@@ -492,9 +516,11 @@ heres the flag dont ask how i got it..... ;>
 
 MetaCTF{Rice_shirt_rice_money}
 
+
 ---
 
 ---
+
 
 <img width="2143" height="1021" alt="image" src="https://github.com/user-attachments/assets/340b36b3-73be-4078-8019-8ed34c48a492" />
 
@@ -517,6 +543,52 @@ Tzo1OiJJbWFnZSI6MTp7czo0OiJwYXRoIjtzOjg6ImZsYWcudHh0Ijt9
 see the flag in the network response tab:
 
 <img width="2441" height="1346" alt="image" src="https://github.com/user-attachments/assets/5a5084ca-4698-4248-91f5-425773e35573" />
+
+
+---
+
+---
+
+
+<img width="2122" height="866" alt="image" src="https://github.com/user-attachments/assets/a27600b1-7ef2-417f-8f34-8be0c8dd9f01" />
+
+Solution:
+Dual-tone multi-frequency (DTMF) signaling is a telecommunication signaling system using the voice-frequency band over telephone lines between telephone to send numbers.
+
+the tone reffers to DTMF
+Tool used = https://dtmf.netlify.app/
+
+<img width="1367" height="1302" alt="image" src="https://github.com/user-attachments/assets/d060abf1-d062-4fc3-a825-295ae8f9a699" />
+
+using cybercheif for octal
+
+<img width="1947" height="918" alt="image" src="https://github.com/user-attachments/assets/53900330-cedd-4a73-bc1a-3150ea5ef2c8" />
+
+
+---
+
+---
+
+
+<img width="2115" height="865" alt="image" src="https://github.com/user-attachments/assets/aadf261c-ad9b-42f3-809c-bb19da5e6541" />
+
+Solution:
+
+One-Time Pad (OTP) is an encryption technique that cannot be cracked, but requires the use of a one-time pre-shared key.
+
+Suggested tool = https://toolbox.lotusfa.com/crib_drag/
+
+"We know the group likes classical books, 
+with one of the actors recently being into Charles Dickens, 
+but we don't have much else to go off of." 
+- is a good hint
+
+Grabbing the first paragraph of that book, courtesy of Project Gutenberg,
+https://www.gutenberg.org/cache/epub/98/pg98-images.html
+
+Reveals the flag:
+
+<img width="1222" height="1196" alt="image" src="https://github.com/user-attachments/assets/ad5de059-b7bd-4833-9285-a3d4d26d9a74" />
 
 
 ---
