@@ -341,7 +341,7 @@ Solution:
 
 Looks like Pigpen cipher
 
-<img width="2560" height="2560" alt="image" src="https://github.com/user-attachments/assets/351c3285-6fbb-4ed5-8df7-e5b98a8b47ac" />
+<img width="1222" height="616" alt="image" src="https://github.com/user-attachments/assets/655f84aa-ed96-472f-b306-441e859dfcd2" />
 Image credits:
 link to the wikipedia = https://wikipedia.org/wiki/Pigpen_cipher
 
