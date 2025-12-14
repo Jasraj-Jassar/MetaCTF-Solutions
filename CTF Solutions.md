@@ -1,4 +1,4 @@
-# Solutions
+<img width="854" height="341" alt="image" src="https://github.com/user-attachments/assets/065886cf-aa39-435c-9d0c-aa228f1bd414" /># Solutions
 
 [**Direct Login](https://compete.metactf.com/289/problems#problem2) - Question** 
 
@@ -391,5 +391,98 @@ Looks like Rot13 encryption, CyberrrrCheifff Timeeee XD
 ---
 
 ---
+
+<img width="2180" height="708" alt="image" src="https://github.com/user-attachments/assets/187e980c-be54-46eb-89f3-77770870a857" />
+
+Solution:
+Using Autopsy tool 
+
+looking at the file names, found the flag.
+
+<img width="1556" height="810" alt="image" src="https://github.com/user-attachments/assets/e5e8a671-605d-4885-bd19-103b4826bd84" />
+
+
+---
+
+---
+
+<img width="2102" height="715" alt="image" src="https://github.com/user-attachments/assets/9a381afb-a04c-4a49-83d0-eea22a883c1c" />
+
+Solution:
+
+Using the tool named TestDisk 7.2, (Data Recovery Utility) to recover and then looking inside the FAT32 partition on the disk.
+
+we find the flag as directory names.
+
+<img width="982" height="502" alt="image" src="https://github.com/user-attachments/assets/c3012888-ab58-44ab-a8c6-01b65fe8d816" />
+
+---
+
+---
+
+<img width="2101" height="763" alt="image" src="https://github.com/user-attachments/assets/3f1f5655-5ef9-4bc2-9b87-f9f3730c1a81" />
+
+Solution:
+
+there are 24 house listed but the last shows the number 25 (/house.php?house=25)
+
+therefore i tried from 1 to 13 and 13 number webpage link thingi had the flag... Easy
+
+<img width="2248" height="1286" alt="image" src="https://github.com/user-attachments/assets/fcb842dc-0973-4a4a-a9df-7dabd9f370f7" />
+
+
+---
+
+---
+
+<img width="2185" height="732" alt="image" src="https://github.com/user-attachments/assets/bfcdc5b5-f652-4255-a20a-adfe6e03dbe3" />
+
+Solution:
+
+This one is tricky but heres the python code i used to decrypt it
+
+"""The script recovers an unknown 8-byte XOR key using the known PNG header, 
+then XORs the entire encrypted file with that key to restore the original image."""
+
+
+from pathlib import Path
+
+enc_path = Path("encrypted.xpng")   # change name if needed
+dec_path = Path("decrypted.png")
+
+# Known PNG header bytes
+png_header = bytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
+
+# Read encrypted file
+data = enc_path.read_bytes()
+
+if len(data) < 8:
+    raise SystemExit("File is too small to be a PNG.")
+
+# Recover 8-byte XOR key from first 8 bytes
+key = bytes([data[i] ^ png_header[i] for i in range(8)])
+print("Recovered key bytes:", key)
+print("Recovered key (repr):", repr(key))
+
+# Decrypt whole file
+dec = bytearray(len(data))
+for i, c in enumerate(data):
+    dec[i] = c ^ key[i % len(key)]
+
+# Write decrypted PNG
+dec_path.write_bytes(dec)
+print("Wrote decrypted PNG to:", dec_path)
+
+
+Found the flag:
+
+<img width="1645" height="640" alt="image" src="https://github.com/user-attachments/assets/bf4d24a7-14e9-4cab-b918-322a2785c0b4" />
+
+
+---
+
+---
+
+
 
 Will continue soon! 
