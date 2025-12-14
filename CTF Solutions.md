@@ -285,3 +285,52 @@ We also have a transcript of the letter [here](https://metaproblems.com/e50c388
 
 It was just a atbash-cipher and decode it to get the flag. :)
 
+---
+
+---
+
+<img width="1841" height="646" alt="image" src="https://github.com/user-attachments/assets/572c16a0-7efb-4f64-8e25-c92bf941c314" />
+
+Solution: 
+Just copy the “Times Borrowed” column into CyberChef, then apply the From Decimal operation using a line feed as the separator.
+
+<img width="1743" height="807" alt="image" src="https://github.com/user-attachments/assets/a7ab5564-49dd-4985-b6c3-529993207a87" />
+
+---
+
+---
+
+<img width="1465" height="487" alt="image" src="https://github.com/user-attachments/assets/b9287cca-4d91-4269-bd1b-b0ad624af9fb" />
+
+Solution: 
+Using Cokkie Editor extention on my browser, found the flag.
+
+<img width="2155" height="1031" alt="image" src="https://github.com/user-attachments/assets/35b9889c-b9d5-47c0-85b0-8e2892a98f6c" />
+
+---
+
+---
+
+<img width="1796" height="885" alt="image" src="https://github.com/user-attachments/assets/8dd674f9-cbaa-4585-80ad-1a860e366036" />
+
+Solution: 
+By the looks of it, its a keyboard shift cypher and theres always a website i know for this.
+
+https://www.dcode.fr/keyboard-shift-cipher
+
+<img width="1326" height="588" alt="image" src="https://github.com/user-attachments/assets/a5fd6017-721f-4b1f-b5ad-9bc9eaa226ca" />
+
+---
+
+---
+
+<img width="1787" height="761" alt="image" src="https://github.com/user-attachments/assets/d1a59330-f839-4624-95bc-a1918be7d5c4" />
+
+Stoped  the container to save their resources after I found the flag. - Good Habbits
+
+Solution:
+<img width="1305" height="696" alt="image" src="https://github.com/user-attachments/assets/f80c5927-b946-41cf-b997-8dc491265038" />
+
+---
+
+---
