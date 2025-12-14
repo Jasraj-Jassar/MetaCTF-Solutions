@@ -281,4 +281,7 @@ Abashed Confessions
 
 We also have a transcript of the letter [here](https://metaproblems.com/e50c3885d7512ce80354b2583d204365/letter_transcript.txt).
 
-Will Continue Soon :) .
+<img width="2301" height="722" alt="image" src="https://github.com/user-attachments/assets/65d013bf-7572-4642-9217-652124257550" />
+
+It was just a atbash-cipher and decode it to get the flag. :)
+
