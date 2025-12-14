@@ -334,3 +334,62 @@ Solution:
 ---
 
 ---
+
+<img width="1755" height="626" alt="image" src="https://github.com/user-attachments/assets/d24c553b-9a89-492f-a650-5f274682e8a2" />
+
+Solution:
+Go to /Sitemap.xml
+
+found a link that is mapped to the main site - not sure if this is professional way of describing sitemap.xml but you got the point
+
+<img width="2415" height="242" alt="image" src="https://github.com/user-attachments/assets/f145df9b-3148-4d51-9134-2f73bca5fa06" />
+
+Used that link to attain the flag. :)
+
+<img width="2396" height="1095" alt="image" src="https://github.com/user-attachments/assets/2f0ec5cc-31ee-434c-8aea-a65f16631a9b" />
+
+---
+
+---
+
+<img width="1802" height="777" alt="image" src="https://github.com/user-attachments/assets/7493d6b1-eb06-4daa-a995-a6ef57c2dba1" />
+
+Solution:
+
+Looks like Pigpen cipher
+
+<img width="2560" height="2560" alt="image" src="https://github.com/user-attachments/assets/351c3285-6fbb-4ed5-8df7-e5b98a8b47ac" />
+Image credits:
+link to the wikipedia = https://wikipedia.org/wiki/Pigpen_cipher
+
+Easy decoding done manually to attain the flag = METACTF{COMICALLYDECODED}
+
+---
+
+---
+
+<img width="1767" height="646" alt="image" src="https://github.com/user-attachments/assets/15e7f848-8c56-4798-a4a2-3262e129eef8" />
+
+Solution: 
+Looks like base64.
+CyberCheif Time :) - i love this tool...
+
+<img width="1318" height="503" alt="image" src="https://github.com/user-attachments/assets/469e3a9f-2401-4d66-bda0-ac86f3e0c70f" />
+
+---
+
+---
+
+<img width="1777" height="521" alt="image" src="https://github.com/user-attachments/assets/6b54acb8-9f0b-48d3-b1b1-dde02e48a6e9" />
+
+Solution:
+
+Looks like Rot13 encryption, CyberrrrCheifff Timeeee XD
+
+<img width="1160" height="562" alt="image" src="https://github.com/user-attachments/assets/f1b183fe-bd25-4186-b1fb-dfb349e61e10" />
+
+---
+
+---
+
+Will continue soon! 
