@@ -450,39 +450,90 @@ from pathlib import Path
 enc_path = Path("encrypted.xpng")   # change name if needed
 dec_path = Path("decrypted.png")
 
-# Known PNG header bytes
+Known PNG header bytes
 png_header = bytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
 
-# Read encrypted file
+Read encrypted file
 data = enc_path.read_bytes()
 
 if len(data) < 8:
     raise SystemExit("File is too small to be a PNG.")
 
-# Recover 8-byte XOR key from first 8 bytes
+Recover 8-byte XOR key from first 8 bytes
 key = bytes([data[i] ^ png_header[i] for i in range(8)])
 print("Recovered key bytes:", key)
 print("Recovered key (repr):", repr(key))
 
-# Decrypt whole file
+Decrypt whole file
 dec = bytearray(len(data))
 for i, c in enumerate(data):
     dec[i] = c ^ key[i % len(key)]
 
-# Write decrypted PNG
+Write decrypted PNG
 dec_path.write_bytes(dec)
 print("Wrote decrypted PNG to:", dec_path)
-
 
 Found the flag:
 
 <img width="1645" height="640" alt="image" src="https://github.com/user-attachments/assets/bf4d24a7-14e9-4cab-b918-322a2785c0b4" />
 
+---
+
+---
+
+<img width="2116" height="807" alt="image" src="https://github.com/user-attachments/assets/13781023-000c-480e-b05a-d480f7a237df" />
+
+Solution:
+Using WireShark to find the file within the packet.
+
+<img width="2238" height="1408" alt="image" src="https://github.com/user-attachments/assets/21f27bf1-bf14-4ed3-853a-daff820800eb" />
+
+Then using Cyber cheif to convert the hex (make sure png header is there) to attain the flag.
+
+<img width="1936" height="905" alt="image" src="https://github.com/user-attachments/assets/8829d8d9-67b9-4095-8847-d6daf5dd5a19" />
 
 ---
 
 ---
 
+<img width="2122" height="781" alt="image" src="https://github.com/user-attachments/assets/7b75ca20-a8f0-4193-bb2b-a62c11b2ef79" />
+
+Solution:
+
+Using a python library
+
+pypykatz lsa minidump lsass.DMP 
+
+and after 45 mins of doing stuff...
+
+heres the flag dont ask how i got it..... ;>
+
+MetaCTF{Rice_shirt_rice_money}
+
+---
+
+---
+
+<img width="2143" height="1021" alt="image" src="https://github.com/user-attachments/assets/340b36b3-73be-4078-8019-8ed34c48a492" />
+
+Solution:
+
+The cookie first will reffer to the file uploded so when converted back to text from base64 its pretty clear that the site use cookies to display files
+
+edit the cookies to request flag.txt from the site 
+
+use base64 for cookies
+
+<img width="1145" height="655" alt="image" src="https://github.com/user-attachments/assets/a1454c2c-0a5e-4651-8062-b4049468016c" />
+
+see the flag in the network response tab:
+
+<img width="2441" height="1346" alt="image" src="https://github.com/user-attachments/assets/5a5084ca-4698-4248-91f5-425773e35573" />
+
+
+---
+
+---
 
 
 Will continue soon! 
