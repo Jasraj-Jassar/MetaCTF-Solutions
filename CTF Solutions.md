@@ -118,41 +118,23 @@ Wheel of Mystery
 Tried allighning the cyper wheel with 3 words  }AB  didnt work
 
 R - {
-
 K - Y
-
 P - W
-
 U - O
-
 Y - U
-
 P - W
-
 F - N
-
 C - E
-
 I - D
-
 A - A
-
 K - Y
-
 K - Y
-
 J - C
-
 M - Z
-
 Y - U
-
 Z - T
-
 Z - T
-
 J - C
-
 T - X
 
 {YWOUWNE DAY YCZUTTCX
@@ -522,7 +504,13 @@ The cookie first will reffer to the file uploded so when converted back to text 
 
 edit the cookies to request flag.txt from the site 
 
-use base64 for cookies
+Also make sure to put s:8 as this is the number of char in "flag.txt"
+
+O:5:"Image":1:{s:4:"path";s:8:"flag.txt";}
+
+use base64 to encrypt our delicious cookies
+
+Tzo1OiJJbWFnZSI6MTp7czo0OiJwYXRoIjtzOjg6ImZsYWcudHh0Ijt9
 
 <img width="1145" height="655" alt="image" src="https://github.com/user-attachments/assets/a1454c2c-0a5e-4651-8062-b4049468016c" />
 
