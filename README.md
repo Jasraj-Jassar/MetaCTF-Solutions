@@ -1,10 +1,9 @@
 <!-- Keep GitHub Pages from squashing images copied with width/height attributes -->
+<!--
 <style>
-img {
-  max-width: 100%;
-  height: auto;
-}
+img { max-width: 100%; height: auto; }
 </style>
+-->
 
 <img width="854" height="341" alt="image" src="https://github.com/user-attachments/assets/065886cf-aa39-435c-9d0c-aa228f1bd414" />
 
@@ -36,6 +35,38 @@ Solved: (all writeups might not be availble as i did some with friends and didnt
 | 200 | Simple Sums<br>Xylophone Network Graphics<br>Filesystem Folly<br>Where We JMPing<br>Mimican't<br>Library<br>Open Application<br>Santa's Digital Photo Gallery<br>Shifty XOR<br>Satellite Command<br>NOThing to C Here<br>On the Grid<br>Phone Home |
 | 250 | SHA256 Collider<br>How Cool Are You?<br>A Tale of Two Ciphertexts<br>Clock Out |
 | 300 | Internet Talk<br>Duality of Key<br>ShaNOISEmir |
+
+---
+
+## Table of Contents
+- [Direct Login](#direct-login)
+- [Camping Adventure](#camping-adventure)
+- [Architecture Astronaut](#architecture-astronaut)
+- [Anonymoose](#anonymoose)
+- [Wheel of Mystery](#wheel-of-mystery)
+- [Cracking The Javashop](#cracking-the-javashop)
+- [Stack Smashers](#stack-smashers)
+- [runCAPTCHA](#runcaptcha)
+- [Slithering Security](#slithering-security)
+- [Abashed Confessions](#abashed-confessions)
+- [Cooked Books](#cooked-books)
+- [Cookie Crackdown](#cookie-crackdown)
+- [Frenzy](#frenzy)
+- [.HiddenFiles](#hiddenfiles)
+- [Treasure Map](#treasure-map)
+- [Working for Peanuts](#working-for-peanuts)
+- [64 Types of Candy](#64-types-of-candy)
+- [What’s ROTten Into You?](#whats-rotten-into-you)
+- [Obnoxious Offset](#obnoxious-offset)
+- [Till Delete Do Us Part](#till-delete-do-us-part)
+- [Door to Door](#door-to-door)
+- [Xylophone Network Graphics](#xylophone-network-graphics)
+- [Filesystem Folly](#filesystem-folly)
+- [Mimican’t](#mimicant)
+- [Santa’s Digital Photo Gallery](#santas-digital-photo-gallery)
+- [Phone Home](#phone-home)
+- [A Tale of Two Ciphertexts](#a-tale-of-two-ciphertexts)
+- [Login Query](#login-query)
 
 ---
 
@@ -175,7 +206,9 @@ METACTF{WHEELYCOOL}
 ---
 
 
-[**Cracking The Javashop**](https://compete.metactf.com/289/problems#problem39)
+## Cracking The Javashop
+
+[Problem link](https://compete.metactf.com/289/problems#problem39)
 
 ![image.png](images/image%206.png)
 
