@@ -294,7 +294,8 @@ It was just a atbash-cipher and decode it to get the flag. :)
 Solution: 
 Just copy the “Times Borrowed” column into CyberChef, then apply the From Decimal operation using a line feed as the separator.
 
-<img width="1743" height="807" alt="image" src="https://github.com/user-attachments/assets/a7ab5564-49dd-4985-b6c3-529993207a87" />
+<img alt="image" src="https://github.com/user-attachments/assets/65d013bf-7572-4642-9217-652124257550"
+     style="width:900px; max-width:100%; height:auto;" />
 
 
 ---
