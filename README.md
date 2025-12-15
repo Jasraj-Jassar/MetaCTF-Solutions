@@ -1,3 +1,11 @@
+<!-- Keep GitHub Pages from squashing images copied with width/height attributes -->
+<style>
+img {
+  max-width: 100%;
+  height: auto;
+}
+</style>
+
 <img width="854" height="341" alt="image" src="https://github.com/user-attachments/assets/065886cf-aa39-435c-9d0c-aa228f1bd414" />
 
 CTFs are amazing!
