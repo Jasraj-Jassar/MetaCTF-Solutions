@@ -8,29 +8,6 @@ CTFs are amazing!
 
 [Link to the webpage that hosts all my solutions](https://jasraj-jassar.github.io/MetaCTF-Solutions/)
 
-Personal write-ups, notes, and scripts for the publicly available practice challenges on the [MetaCTF](https://metactf.com/) cyber-skills platform.
-
-MetaCTF hosts hands-on Capture-the-Flag (CTF) exercises that cover web exploitation, cryptography, reverse engineering, forensics, OSINT, and binary exploitation. These challenges simulate real-world scenarios and help learners sharpen practical security skills.
-
-> *This repository contains my solutions to the practice challenges hosted by MetaCTF and is **not** officially affiliated with MetaCTF or its founders.*
-
----
-
-Many thanks to the MetaCTF team for providing high-quality, freely accessible learning content.
-
----
-
-Solved: (all writeups might not be availble as i did some with friends and didnt to take notes)
-
-| Points | Challenges |
-| --- | --- |
-| 50 | Port Authority<br>Baby Something<br>.HiddenFiles |
-| 100 | Camping Adventures<br>26 Dimensions<br>Architecture Astronaut<br>Anonymoose<br>Cracking the Javashop<br>Stack Smashers<br>runCAPTCHA<br>Slithering Security<br>Admin Portal<br>Abashed Confessions<br>Cooked Books<br>Cookie Crackdown<br>Browser, Wowser<br>Frenzy<br>Caffeine Conundrum<br>Treasure Map<br>Working for Peanuts<br>All About Flags<br>Digging for Answers II<br>64 Types of Candy<br>What's ROTten Into You? |
-| 150 | Obfuscated Secrets<br>Direct Login<br>Login Query<br>Obnoxious Offset<br>Lost Luggage<br>Wheel of Mystery<br>Canary in the Bitcoin Mine<br>Key for Me<br>Spider's Curse<br>Rear Hatch<br>better_eval()<br>Till Delete Do Us Part<br>Ms Blue Sky<br>Magical Meta<br>Rainbow Box<br>Bad OpSec<br>Door to Door<br>Shell Game |
-| 200 | Simple Sums<br>Xylophone Network Graphics<br>Filesystem Folly<br>Where We JMPing<br>Mimican't<br>Library<br>Open Application<br>Santa's Digital Photo Gallery<br>Shifty XOR<br>Satellite Command<br>NOThing to C Here<br>On the Grid<br>Phone Home |
-| 250 | SHA256 Collider<br>How Cool Are You?<br>A Tale of Two Ciphertexts<br>Clock Out |
-| 300 | Internet Talk<br>Duality of Key<br>ShaNOISEmir |
-
 ---
 
 ## Table of Contents
@@ -65,6 +42,31 @@ Solved: (all writeups might not be availble as i did some with friends and didnt
 
 ---
 
+Personal write-ups, notes, and scripts for the publicly available practice challenges on the [MetaCTF](https://metactf.com/) cyber-skills platform.
+
+MetaCTF hosts hands-on Capture-the-Flag (CTF) exercises that cover web exploitation, cryptography, reverse engineering, forensics, OSINT, and binary exploitation. These challenges simulate real-world scenarios and help learners sharpen practical security skills.
+
+> *This repository contains my solutions to the practice challenges hosted by MetaCTF and is **not** officially affiliated with MetaCTF or its founders.*
+
+---
+
+Many thanks to the MetaCTF team for providing high-quality, freely accessible learning content.
+
+---
+
+Solved: (all writeups might not be availble as i did some with friends and didnt to take notes)
+
+| Points | Challenges |
+| --- | --- |
+| 50 | Port Authority, Baby Something, .HiddenFiles |
+| 100 | Camping Adventures, 26 Dimensions, Architecture Astronaut, Anonymoose, Cracking the Javashop, Stack Smashers, runCAPTCHA, Slithering Security, Admin Portal, Abashed Confessions, Cooked Books, Cookie Crackdown, Browser, Wowser, Frenzy, Caffeine Conundrum, Treasure Map, Working for Peanuts, All About Flags, Digging for Answers II, 64 Types of Candy, What's ROTten Into You? |
+| 150 | Obfuscated Secrets, Direct Login, Login Query, Obnoxious Offset, Lost Luggage, Wheel of Mystery, Canary in the Bitcoin Mine, Key for Me, Spider's Curse, Rear Hatch, better_eval(), Till Delete Do Us Part, Ms Blue Sky, Magical Meta, Rainbow Box, Bad OpSec, Door to Door, Shell Game |
+| 200 | Simple Sums, Xylophone Network Graphics, Filesystem Folly, Where We JMPing, Mimican't, Library, Open Application, Santa's Digital Photo Gallery, Shifty XOR, Satellite Command, NOThing to C Here, On the Grid, Phone Home |
+| 250 | SHA256 Collider, How Cool Are You?, A Tale of Two Ciphertexts, Clock Out |
+| 300 | Internet Talk, Duality of Key, ShaNOISEmir |
+
+---
+
 ## Direct Login
 
 <img width="1783" height="497" alt="image" src="https://github.com/user-attachments/assets/e4c6b889-c60d-4844-8817-d5fd1d4c0968" />
@@ -82,8 +84,6 @@ Meaning adding /employee_portal.php to the URL takes you there.
 
 ---
 
----
-
 
 ## Camping Adventure
 
@@ -91,8 +91,6 @@ Meaning adding /employee_portal.php to the URL takes you there.
 
 Solution Perform Google Image Search.
 
-
----
 
 ---
 
@@ -128,8 +126,6 @@ Flag: xtensa
 
 ---
 
----
-
 
 ## Anonymoose
 
@@ -146,8 +142,6 @@ Downloaded the PDF - Viewed its MetaData using the following website
 
 ---
 
----
-
 
 ## Wheel of Mystery
 
@@ -155,28 +149,10 @@ Downloaded the PDF - Viewed its MetaData using the following website
 
 ![image.png](images/image%205.png)
 
-Tried allighning the cyper wheel with 3 words  }AB  didnt work
+Tried aligning the cipher wheel with 3 words `}AB` but it didn’t work:
 
 ```
-R - {
-K - Y
-P - W
-U - O
-Y - U
-P - W
-F - N
-C - E
-I - D
-A - A
-K - Y
-K - Y
-J - C
-M - Z
-Y - U
-Z - T
-Z - T
-J - C
-T - X
+R->{, K->Y, P->W, U->O, Y->U, F->N, C->E, I->D, A->A, J->C, M->Z, Z->T, T->X
 ```
 
 {YWOUWNE DAY YCZUTTCX
@@ -185,9 +161,9 @@ Failed - Trying Again
 
 Recreating the cypher wheel using METACTF{ becasue this is the format they want the awnser in.
 
-A B C D E F G  H I    J K L  M N O P Q R S T U V W X Y Z {   }
-
-H G { Q N F U  V W L E  Z  Y X P T  K M R } A B  J   I C O S  D 
+```
+A->H, B->G, C->{, D->Q, E->N, F->F, G->U, H->V, I->W, J->L, K->E, L->Z, M->Y, N->X, O->P, P->T, Q->K, R->M, S->R, T->}, U->A, V->B, W->J, X->I, Y->C, Z->O, {->S, }->D
+```
 
 `RKPUYPFCIAKKJMYZZJT` 
 
@@ -195,8 +171,6 @@ Awnser =
 
 METACTF{WHEELYCOOL}
 
-
----
 
 ---
 
@@ -216,8 +190,6 @@ Went to the Script and found the Code
 
 ---
 
----
-
 
 ## Stack Smashers
 
@@ -231,8 +203,6 @@ Solution Just added more than 16 char the buffer overflow and got the flag.
 
 Learn more about buffer overflows from the classic paper [Smashing the Stack for Fun and Profit](http://phrack.org/issues/49/14.html) by Aleph One.
 
-
----
 
 ---
 
@@ -278,8 +248,6 @@ It is a Windows **built-in executable** (`mshta.exe`) used to run **HTML Applica
 
 ---
 
----
-
 
 ## Slithering Security
 
@@ -305,8 +273,6 @@ Flag Captured!
 
 ---
 
----
-
 
 ## Abashed Confessions
 
@@ -318,8 +284,6 @@ We also have a transcript of the letter [here](https://metaproblems.com/e50c388
 
 It was just a atbash-cipher and decode it to get the flag. :)
 
-
----
 
 ---
 
@@ -336,8 +300,6 @@ Just copy the “Times Borrowed” column into CyberChef, then apply the From De
 
 ---
 
----
-
 
 ## Cookie Crackdown
 
@@ -348,8 +310,6 @@ Using Cokkie Editor extention on my browser, found the flag.
 
 <img width="2155" height="1031" alt="image" src="https://github.com/user-attachments/assets/35b9889c-b9d5-47c0-85b0-8e2892a98f6c" />
 
-
----
 
 ---
 
@@ -368,8 +328,6 @@ https://www.dcode.fr/keyboard-shift-cipher
 
 ---
 
----
-
 
 ## .HiddenFiles
 
@@ -380,8 +338,6 @@ Stoped  the container to save their resources after I found the flag. - Good Hab
 Solution:
 <img width="1305" height="696" alt="image" src="https://github.com/user-attachments/assets/f80c5927-b946-41cf-b997-8dc491265038" />
 
-
----
 
 ---
 
@@ -404,8 +360,6 @@ Used that link to attain the flag. :)
 
 ---
 
----
-
 
 ## Working for Peanuts
 
@@ -424,8 +378,6 @@ Easy decoding done manually to attain the flag = METACTF{COMICALLYDECODED}
 
 ---
 
----
-
 
 ## 64 Types of Candy
 
@@ -437,8 +389,6 @@ CyberCheif Time :) - i love this tool...
 
 <img width="1318" height="503" alt="image" src="https://github.com/user-attachments/assets/469e3a9f-2401-4d66-bda0-ac86f3e0c70f" />
 
-
----
 
 ---
 
@@ -456,8 +406,6 @@ Looks like Rot13 encryption, CyberrrrCheifff Timeeee XD
 
 ---
 
----
-
 
 ## Obnoxious Offset
 
@@ -470,8 +418,6 @@ looking at the file names, found the flag.
 
 <img width="1556" height="810" alt="image" src="https://github.com/user-attachments/assets/e5e8a671-605d-4885-bd19-103b4826bd84" />
 
-
----
 
 ---
 
@@ -491,8 +437,6 @@ we find the flag as directory names.
 
 ---
 
----
-
 
 ## Door to Door
 
@@ -506,8 +450,6 @@ therefore i tried from 1 to 13 and 13 number webpage link thingi had the flag...
 
 <img width="2248" height="1286" alt="image" src="https://github.com/user-attachments/assets/fcb842dc-0973-4a4a-a9df-7dabd9f370f7" />
 
-
----
 
 ---
 
@@ -562,8 +504,6 @@ Found the flag:
 
 ---
 
----
-
 
 ## Filesystem Folly
 
@@ -578,8 +518,6 @@ Then using Cyber cheif to convert the hex (make sure png header is there) to att
 
 <img width="1936" height="905" alt="image" src="https://github.com/user-attachments/assets/8829d8d9-67b9-4095-8847-d6daf5dd5a19" />
 
-
----
 
 ---
 
@@ -600,8 +538,6 @@ heres the flag dont ask how i got it..... ;>
 
 MetaCTF{Rice_shirt_rice_money}
 
-
----
 
 ---
 
@@ -633,8 +569,6 @@ see the flag in the network response tab:
 
 ---
 
----
-
 
 ## Phone Home
 
@@ -652,8 +586,6 @@ using cybercheif for octal
 
 <img width="1947" height="918" alt="image" src="https://github.com/user-attachments/assets/53900330-cedd-4a73-bc1a-3150ea5ef2c8" />
 
-
----
 
 ---
 
@@ -683,8 +615,6 @@ Reveals the flag:
 
 ---
 
----
-
 
 ## Login Query
 
@@ -704,8 +634,6 @@ Username = jim404' OR '1'='1
 The flag:
 <img width="2061" height="888" alt="image" src="https://github.com/user-attachments/assets/32139c6e-d1b4-45e5-ab0d-314226434854" />
 
-
----
 
 ---
 
