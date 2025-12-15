@@ -31,7 +31,7 @@ Solved: (all writeups might not be availble as i did some with friends and didnt
 
 ---
 
-[**Direct Login](https://compete.metactf.com/289/problems#problem2) - Question** 
+## Direct Login
 
 <img width="1783" height="497" alt="image" src="https://github.com/user-attachments/assets/e4c6b889-c60d-4844-8817-d5fd1d4c0968" />
 
@@ -51,7 +51,7 @@ Meaning adding /employee_portal.php to the URL takes you there.
 ---
 
 
-Camping Adventure
+## Camping Adventure
 
 ![image.png](images/image%201.png)
 
@@ -63,7 +63,7 @@ Solution Perform Google Image Search.
 ---
 
 
-Architecture Astronaut
+## Architecture Astronaut
 
 ![image.png](images/image%202.png)
 
@@ -97,7 +97,7 @@ Flag: xtensa
 ---
 
 
-[**Anonymoose**](https://compete.metactf.com/289/problems#problem29)
+## Anonymoose
 
 ![image.png](images/image%203.png)
 
@@ -115,7 +115,7 @@ Downloaded the PDF - Viewed its MetaData using the following website
 ---
 
 
-Wheel of Mystery
+## Wheel of Mystery
 
 ![image.png](images/image%204.png)
 
@@ -147,7 +147,7 @@ T - X
 
 {YWOUWNE DAY YCZUTTCX
 
-Failed 
+Failed - Trying Again
 
 Recreating the cypher wheel using METACTF{ becasue this is the format they want the awnser in.
 
@@ -183,7 +183,7 @@ Went to the Script and found the Code
 ---
 
 
-Stack Smashers
+## Stack Smashers
 
 ![image.png](images/image%208.png)
 
@@ -200,8 +200,7 @@ Learn more about buffer overflows from the classic paper [Smashing the Stack fo
 
 ---
 
-
-START FROM HERE - [https://compete.metactf.com/289/problems](https://compete.metactf.com/289/problems) 
+## runCAPTCHA
 
 ![image.png](images/image%209.png)
 
@@ -246,7 +245,7 @@ It is a Windows **built-in executable** (`mshta.exe`) used to run **HTML Applica
 ---
 
 
-Slithering Security
+## Slithering Security
 
 ![image.png](images/image%2010.png)
 
@@ -273,7 +272,7 @@ Flag Captured!
 ---
 
 
-Abashed Confessions
+## Abashed Confessions
 
 ![image.png](images/image%2012.png)
 
@@ -288,6 +287,7 @@ It was just a atbash-cipher and decode it to get the flag. :)
 
 ---
 
+## Cooked Books
 
 <img width="1841" height="646" alt="image" src="https://github.com/user-attachments/assets/572c16a0-7efb-4f64-8e25-c92bf941c314" />
 
@@ -302,6 +302,8 @@ Just copy the “Times Borrowed” column into CyberChef, then apply the From De
 ---
 
 
+## Cookie Crackdown
+
 <img width="1465" height="487" alt="image" src="https://github.com/user-attachments/assets/b9287cca-4d91-4269-bd1b-b0ad624af9fb" />
 
 Solution: 
@@ -314,6 +316,8 @@ Using Cokkie Editor extention on my browser, found the flag.
 
 ---
 
+
+## Frenzy
 
 <img width="1796" height="885" alt="image" src="https://github.com/user-attachments/assets/8dd674f9-cbaa-4585-80ad-1a860e366036" />
 
@@ -330,6 +334,8 @@ https://www.dcode.fr/keyboard-shift-cipher
 ---
 
 
+## .HiddenFiles
+
 <img width="1787" height="761" alt="image" src="https://github.com/user-attachments/assets/d1a59330-f839-4624-95bc-a1918be7d5c4" />
 
 Stoped  the container to save their resources after I found the flag. - Good Habbits
@@ -342,6 +348,8 @@ Solution:
 
 ---
 
+
+## Treasure Map
 
 <img width="1755" height="626" alt="image" src="https://github.com/user-attachments/assets/d24c553b-9a89-492f-a650-5f274682e8a2" />
 
@@ -362,6 +370,8 @@ Used that link to attain the flag. :)
 ---
 
 
+## Working for Peanuts
+
 <img width="1802" height="777" alt="image" src="https://github.com/user-attachments/assets/7493d6b1-eb06-4daa-a995-a6ef57c2dba1" />
 
 Solution:
@@ -380,6 +390,8 @@ Easy decoding done manually to attain the flag = METACTF{COMICALLYDECODED}
 ---
 
 
+## 64 Types of Candy
+
 <img width="1767" height="646" alt="image" src="https://github.com/user-attachments/assets/15e7f848-8c56-4798-a4a2-3262e129eef8" />
 
 Solution: 
@@ -393,6 +405,8 @@ CyberCheif Time :) - i love this tool...
 
 ---
 
+
+## What’s ROTten Into You?
 
 <img width="1777" height="521" alt="image" src="https://github.com/user-attachments/assets/6b54acb8-9f0b-48d3-b1b1-dde02e48a6e9" />
 
@@ -408,6 +422,8 @@ Looks like Rot13 encryption, CyberrrrCheifff Timeeee XD
 ---
 
 
+## Obnoxious Offset
+
 <img width="2180" height="708" alt="image" src="https://github.com/user-attachments/assets/187e980c-be54-46eb-89f3-77770870a857" />
 
 Solution:
@@ -422,6 +438,8 @@ looking at the file names, found the flag.
 
 ---
 
+
+## Till Delete Do Us Part
 
 <img width="2102" height="715" alt="image" src="https://github.com/user-attachments/assets/9a381afb-a04c-4a49-83d0-eea22a883c1c" />
 
@@ -439,6 +457,8 @@ we find the flag as directory names.
 ---
 
 
+## Door to Door
+
 <img width="2101" height="763" alt="image" src="https://github.com/user-attachments/assets/3f1f5655-5ef9-4bc2-9b87-f9f3730c1a81" />
 
 Solution:
@@ -454,6 +474,8 @@ therefore i tried from 1 to 13 and 13 number webpage link thingi had the flag...
 
 ---
 
+
+## Xylophone Network Graphics
 
 <img width="2185" height="732" alt="image" src="https://github.com/user-attachments/assets/bfcdc5b5-f652-4255-a20a-adfe6e03dbe3" />
 
@@ -506,6 +528,8 @@ Found the flag:
 ---
 
 
+## Filesystem Folly
+
 <img width="2116" height="807" alt="image" src="https://github.com/user-attachments/assets/13781023-000c-480e-b05a-d480f7a237df" />
 
 Solution:
@@ -522,6 +546,8 @@ Then using Cyber cheif to convert the hex (make sure png header is there) to att
 
 ---
 
+
+## Mimican’t
 
 <img width="2122" height="781" alt="image" src="https://github.com/user-attachments/assets/7b75ca20-a8f0-4193-bb2b-a62c11b2ef79" />
 
@@ -542,6 +568,8 @@ MetaCTF{Rice_shirt_rice_money}
 
 ---
 
+
+## Santa’s Digital Photo Gallery
 
 <img width="2143" height="1021" alt="image" src="https://github.com/user-attachments/assets/340b36b3-73be-4078-8019-8ed34c48a492" />
 
@@ -571,6 +599,8 @@ see the flag in the network response tab:
 ---
 
 
+## Phone Home
+
 <img width="2122" height="866" alt="image" src="https://github.com/user-attachments/assets/a27600b1-7ef2-417f-8f34-8be0c8dd9f01" />
 
 Solution:
@@ -590,6 +620,8 @@ using cybercheif for octal
 
 ---
 
+
+## A Tale of Two Ciphertexts
 
 <img width="2115" height="865" alt="image" src="https://github.com/user-attachments/assets/aadf261c-ad9b-42f3-809c-bb19da5e6541" />
 
@@ -616,6 +648,8 @@ Reveals the flag:
 
 ---
 
+
+## Login Query
 
 <img width="1748" height="633" alt="image" src="https://github.com/user-attachments/assets/9b899760-44fa-4a31-abf0-ec628c528149" />
 
