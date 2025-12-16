@@ -637,6 +637,18 @@ The flag:
 
 ---
 
+## Terminal Illness
+
+Solution:
+
+<img width="2053" height="691" alt="image" src="https://github.com/user-attachments/assets/d904a4e8-1fd7-4755-9699-1d0f1c23dd17" />
+
+using exterm to emulate those Tektronix retro style graphical displays to get the flag.
+
+<img width="1208" height="1330" alt="image" src="https://github.com/user-attachments/assets/7ad3b813-6d69-4cc6-9de9-88834e669150" />
+
+
+---
 
 Will continue soon! 
 
