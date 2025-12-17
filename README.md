@@ -650,6 +650,32 @@ using exterm to emulate those Tektronix retro style graphical displays to get th
 
 ---
 
+## Impossible Login
+
+<img width="1905" height="685" alt="image" src="https://github.com/user-attachments/assets/257732cf-2580-4153-b1d5-7593a170c9be" />
+
+Solution:
+Using Ghidra Tool
+
+Found login details:
+<img width="1920" height="767" alt="image" src="https://github.com/user-attachments/assets/e24e21d2-3480-4da0-a125-719b9e59a810" />
+
+Segmentation Fault:
+<img width="1363" height="317" alt="image" src="https://github.com/user-attachments/assets/f491e181-beff-4c87-9af6-270d5933a7ee" />
+
+Possiblly because we dont have the file on the local system:
+<img width="1533" height="815" alt="image" src="https://github.com/user-attachments/assets/f2413c47-0fd9-4871-9da8-4bfba2f1a6f8" />
+
+After some research, found out that there is a buffer over flow vul and can be exploited, in this case we will use the root login
+
+Basically the password can be overflowed and be writtien on top of the username
+
+<img width="1342" height="478" alt="image" src="https://github.com/user-attachments/assets/f25e7b99-09dc-46a6-9141-054f78e94bb2" />
+
+Got the Flag!
+
+---
+
 Will continue soon! 
 
 :)
