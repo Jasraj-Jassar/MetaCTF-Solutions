@@ -700,6 +700,31 @@ Gotcha!
 
 ---
 
+## Talk To Me
+
+<img width="2081" height="668" alt="image" src="https://github.com/user-attachments/assets/a7d6edb4-bc23-46f2-9608-0471da921c31" />
+
+talktome.pcap: network traffic via USB protocol (audio data)
+
+Command for extracting audio data
+
+```
+tshark -r talktome.pcap -T fields -e usb.iso.data \
+| tr -cd '0-9a-fA-F' \
+| python3 -c 'import sys,binascii; sys.stdout.buffer.write(binascii.unhexlify(sys.stdin.read()))' \
+> audio.raw
+
+```
+
+Using Audacity to play the raw file (files > import> raw data)
+
+<img width="2347" height="1057" alt="image" src="https://github.com/user-attachments/assets/95bfc01b-54f8-4b2f-a452-cb43eeee42d1" />
+
+The flag = MetaCTF{4_l1ttl3_b1rd_t0ld_m3}
+
+
+---
+
 Will continue soon! 
 
 :)
