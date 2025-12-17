@@ -680,14 +680,15 @@ Got the Flag!
 
 <img width="1588" height="707" alt="image" src="https://github.com/user-attachments/assets/c2ab4da2-e312-4d4f-ac65-62d990508fd7" />
 
-
-After analyzing, it becomes clear that there is a header "isAdmin" which can be used as "isAdmin":true at the request when registed.
-
 This is if registered without our special privillages XD.
+
+So looking carefully here, time to try the register this is what the Request and Response looks like.
+
 <img width="1270" height="500" alt="image" src="https://github.com/user-attachments/assets/22752768-43a6-4db9-8e2a-9526c01a8c7a" />
 
-So looking carefully here, time to try the register this is what the Request looks like.
 <img width="1045" height="480" alt="image" src="https://github.com/user-attachments/assets/1a229ea2-82ed-462c-b8a3-b07ae21026a8" />
+
+After analyzing, it becomes clear that there is a header "isAdmin" which can be used as "isAdmin":true at the request when registed.
 
 so based on that idea, trying ["register",{"username":"test","password":"123", "isAdmin":true }]
 <img width="1137" height="582" alt="image" src="https://github.com/user-attachments/assets/53aadb7f-42ad-4a7b-b9e3-1c4be6b2b0a4" />
