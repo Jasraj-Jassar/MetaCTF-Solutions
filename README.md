@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="assets/style.css">
  
-<img width="854" height="341" alt="image" src="https://github.com/user-attachments/assets/065886cf-aa39-435c-9d0c-aa228f1bd414" />
+<img width="1317" height="1151" alt="image" src="https://github.com/user-attachments/assets/d3ad0476-fb72-4f3c-911f-a252a45b3b45" />
 
 CTFs are amazing!
 
