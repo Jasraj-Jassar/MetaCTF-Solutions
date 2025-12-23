@@ -10,6 +10,7 @@ CTFs are amazing!
 
 ---
 
+
 ## Table of Contents
 - [Direct Login](#direct-login)
 - [Camping Adventure](#camping-adventure)
@@ -39,6 +40,11 @@ CTFs are amazing!
 - [Phone Home](#phone-home)
 - [A Tale of Two Ciphertexts](#a-tale-of-two-ciphertexts)
 - [Login Query](#login-query)
+
+---
+
+## More Competitions
+- [MetaCTF December 2025 Flash CTF](metactf_dec25_flash_ctf/Readme.md)
 
 ---
 
