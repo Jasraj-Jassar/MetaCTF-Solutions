@@ -49,6 +49,7 @@ CTFs are amazing!
 
 ## More Competitions
 - [MetaCTF December 2025 Flash CTF](metactf_dec25_flash_ctf/Readme.md)
+- [Advent of CTF 2025 Writeup Compendium](advent_of_ctf_2025/README.md)
 
 ---
 

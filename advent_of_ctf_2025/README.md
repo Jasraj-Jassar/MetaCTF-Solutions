@@ -1,65 +1,39 @@
 # Advent of CTF 2025 Writeup Compendium
 
-## Note: These writeups are from https://cyberstudents.net/ and are not part of MetaCTF.
+> Note: These writeups are from https://cyberstudents.net/ and are not part of MetaCTF.
 
-## Community Contributors
+Community Contributors  
+December 30, 2025
 
-## December 30, 2025
+This booklet compiles all available Advent of CTF 2025 writeups from this project directory into a single, printable reference. The writeups are reproduced verbatim with light formatting so the original voice and structure are preserved.
 
-## This booklet compiles all available Advent of CTF 2025 writeups from this project directory into a single,
+Some challenges include supplemental notes or raw session logs; those appear as separate sections for completeness.
 
-## printable reference. The writeups are reproduced verbatim with light formatting so the original voice and structure
+## Contents
+1. Custom Packaging CTF Writeup
+2. Drone Control (Reverse / Network)
+3. NPLD Mainframe Authentication -- Reverse Engineering Write-Up
+4. Failed_Exfil Write-up (Format String -> Recover Admin Code -> Dump Metadata)
+5. Krampus Syndicate’s Failed Exfil Service
+6. Frostbyte CTF Challenge Writeup
+7. Packet Tracer - Activity Grader
+8. Image Security Walkthrough (86/100)
+9. Jingle’s Validator
+10. Kramazon - Santa Priority (Auth Cookie Bypass)
+11. KDNU-3B Firmware HACK Writeup
+12. Jingle’s "unbreakable" Crypto
+13. Multifactorial CTF Write-up (csd.lol)
+14. Re-Key-very - Cryptography Challenge Writeup
+15. Krampus DNS Shenanigans - How I Got the Flag
+16. Syndiware - Forensics Challenge Writeup
+17. TIME TO Escalate
+18. What happens to the response time when you get the first digit right?
+19. Trust Issues CTF Writeup
 
-## are preserved.
-
-## Some challenges include supplemental notes or raw session logs; those appear as separate sections for com-
-
-## pleteness.
-
-## 1. Contents
 
 ## 1. Custom Packaging CTF Writeup
 
-## 2. Drone Control (Reverse / Network)
-
-## 3. NPLD Mainframe Authentication -- Reverse Engineering Write-Up
-
-## 4. Failed_Exfil Write-up (Format String -> Recover Admin Code -> Dump Metadata)
-
-## 5. Krampus Syndicate’s Failed Exfil Service
-
-## 6. Frostbyte CTF Challenge Writeup
-
-## 7. Packet Tracer - Activity Grader
-
-## 8. Image Security Walkthrough (86/100)
-
-## 9. Jingle’s Validator
-
-## 10. Kramazon - Santa Priority (Auth Cookie Bypass)
-
-## 11. KDNU-3B Firmware HACK Writeup
-
-## 12. Jingle’s "unbreakable" Crypto
-
-## 13. Multifactorial CTF Write-up (csd.lol)
-
-## 14. Re-Key-very - Cryptography Challenge Writeup
-
-## 15. Krampus DNS Shenanigans - How I Got the Flag
-
-## 16. Syndiware - Forensics Challenge Writeup
-
-## 17. TIME TO Escalate
-
-## 18. What happens to the response time when you get the first digit right?
-
-## 19. Trust Issues CTF Writeup
-
-
-## 2. Custom Packaging CTF Writeup
-
-## Source: writeups/Custom_packagingctf_writeup.txt
+*Source: writeups/Custom_packagingctf_writeup.txt*
 
 ### ================================================================================
 
@@ -196,7 +170,7 @@ Translation: "Krampus really likes to make everything custom"
 SOLUTION CODE
 ================================================================================
 
-‘‘‘python
+```python
 import struct
 import hashlib
 from arc4 import ARC
@@ -253,7 +227,7 @@ if b’csd{’ in dec_data:
 match = re.search(rb’csd\{[ˆ}]+\}’, dec_data)
 if match:
 print(f"FLAG: {match.group().decode()}")
-‘‘‘
+```
 
 ================================================================================
 KEY TAKEAWAYS
@@ -273,9 +247,9 @@ END OF WRITEUP
 ================================================================================
 
 
-## 3. Drone Control (Reverse / Network)
+## 2. Drone Control (Reverse / Network)
 
-## Source: writeups/Drone_hunt_writeup.txt
+*Source: writeups/Drone_hunt_writeup.txt*
 
 ```
 Challenge: Drone Control (Reverse / Network)
@@ -306,9 +280,9 @@ Final Flag:
 csd{h00r4y_now_U_h4v3_a_dr0ne_army_5846a7b30c}
 
 
-## 4. NPLD Mainframe Authentication -- Reverse Engineering Write-Up
+## 3. NPLD Mainframe Authentication -- Reverse Engineering Write-Up
 
-## Source: writeups/Elfs_writeup.txt
+*Source: writeups/Elfs_writeup.txt*
 
 NPLD Mainframe Authentication -- Reverse Engineering Write-Up
 Challenge Overview
@@ -463,9 +437,9 @@ Flag:
 csd{1nt0_th3_m41nfr4m3}
 
 
-## 5. Failed_Exfil Write-up (Format String -> Recover Admin Code -> Dump Metadata)
+## 4. Failed_Exfil Write-up (Format String -> Recover Admin Code -> Dump Metadata)
 
-## Source: writeups/Failed_Exfil_Writeup.txt
+*Source: writeups/Failed_Exfil_Writeup.txt*
 
 Failed_Exfil Write-up (Format String -> Recover Admin Code -> Dump Metadata)
 Summary
@@ -637,9 +611,9 @@ Convert to signed decimal
 admin -> enter decimal -> print metadata
 
 
-## 6. Krampus Syndicate’s Failed Exfil Service
+## 5. Krampus Syndicate’s Failed Exfil Service
 
-## Source: writeups/FailedExfil.txt
+*Source: writeups/FailedExfil.txt*
 
 ### ================================================================================
 
@@ -875,9 +849,9 @@ Thanks for the challenge! Merry KRAMPUS!
 ================================================================================
 
 
-## 7. Frostbyte CTF Challenge Writeup
+## 6. Frostbyte CTF Challenge Writeup
 
-## Source: writeups/frostbyte_writeup.txt
+*Source: writeups/frostbyte_writeup.txt*
 
 Frostbyte CTF Challenge Writeup
 ================================
@@ -973,9 +947,9 @@ Author’s Note (from flag.txt)
 "i gave up on theming ts a long time ago :sob: - vipin"
 
 
-## 8. Packet Tracer - Activity Grader
+## 7. Packet Tracer - Activity Grader
 
-## Source: writeups/HolidayWriting_writeup.txt
+*Source: writeups/HolidayWriting_writeup.txt*
 
 Packet Tracer - Activity Grader
 Network Configuration & Hardening Write-Up
@@ -1163,9 +1137,9 @@ Status: Solved
 Tool Used: Cisco Packet Tracer v9.0.0
 
 
-## 9. Image Security Walkthrough (86/100)
+## 8. Image Security Walkthrough (86/100)
 
-## Source: writeups/Image Security.txt
+*Source: writeups/Image Security.txt*
 
 ```
 Image Security Walkthrough (86/100)
@@ -1396,9 +1370,9 @@ Humor Footnote
 - RDP is that friend who eats all your snacks. I locked the pantry, hid the snacks, wired motion sensors, and told the neighbor’s dog to bark at port 3389.
 
 
-## 10. Jingle’s Validator
+## 9. Jingle’s Validator
 
-## Source: writeups/Jingle's Validator.txt
+*Source: writeups/Jingle's Validator.txt*
 
 ### ================================================================================
 
@@ -1883,9 +1857,9 @@ GG WP
 ================================================================================
 
 
-## 11. Kramazon - Santa Priority (Auth Cookie Bypass)
+## 10. Kramazon - Santa Priority (Auth Cookie Bypass)
 
-## Source: writeups/karmazon_wrtieup.txt
+*Source: writeups/karmazon_wrtieup.txt*
 
 Kramazon - Santa Priority (Auth Cookie Bypass)
 Challenge Summary
@@ -2045,9 +2019,9 @@ Enforce authorization server-side only
 Flag
 
 
-## 12. KDNU-3B Firmware HACK Writeup
+## 11. KDNU-3B Firmware HACK Writeup
 
-## Source: writeups/KDNU-3B.txt
+*Source: writeups/KDNU-3B.txt*
 
 ### ================================================================================
 
@@ -2211,9 +2185,9 @@ Written with love and caffeine
 - Your friendly neighborhood reverse engineer
 
 
-## 13. Jingle’s "unbreakable" Crypto
+## 12. Jingle’s "unbreakable" Crypto
 
-## Source: writeups/LogFolly.txt
+*Source: writeups/LogFolly.txt*
 
 ### ================================================================================
 
@@ -2465,9 +2439,9 @@ Thanks Jingle! Your "real cryptography" was very educational!
 ================================================================================
 
 
-## 14. Multifactorial CTF Write-up (csd.lol)
+## 13. Multifactorial CTF Write-up (csd.lol)
 
-## Source: writeups/multifactorial_writeup.txt
+*Source: writeups/multifactorial_writeup.txt*
 
 ```
 Multifactorial CTF Write-up (csd.lol)
@@ -2598,9 +2572,9 @@ Root causes & mitigations
 - Stage 3: Do not trust client-provided userHandle. The relying party must map the assertion’s credentialId to the stored user record (where userHandle was originally bound) and ignore any userHandle sent by the client. Also avoid predictable/truncated user identifiers; store random 32-byte user handles.
 
 
-## 15. Re-Key-very - Cryptography Challenge Writeup
+## 14. Re-Key-very - Cryptography Challenge Writeup
 
-## Source: writeups/Re-Key-very.txt
+*Source: writeups/Re-Key-very.txt*
 
 Re-Key-very - Cryptography Challenge Writeup
 =============================================
@@ -2706,9 +2680,9 @@ Key Insights:
 6. Flag translates to: "predictable nonce == weak"
 
 
-## 16. Krampus DNS Shenanigans - How I Got the Flag
+## 15. Krampus DNS Shenanigans - How I Got the Flag
 
-## Source: writeups/Syndicate.txt
+*Source: writeups/Syndicate.txt*
 
 Krampus DNS Shenanigans - How I Got the Flag
 ===========================================
@@ -2846,9 +2820,9 @@ Lessons Learned
 End of suffering.
 
 
-## 17. Syndiware - Forensics Challenge Writeup
+## 16. Syndiware - Forensics Challenge Writeup
 
-## Source: writeups/Syndiware.txt
+*Source: writeups/Syndiware.txt*
 
 Syndiware - Forensics Challenge Writeup
 ========================================
@@ -2997,9 +2971,9 @@ Key Insights:
 5. Flag translates to: "Terrible Ransomware Also 67 Is Dead"
 
 
-## 18. TIME TO Escalate
+## 17. TIME TO Escalate
 
-## Source: writeups/Time To Escalate.txt
+*Source: writeups/Time To Escalate.txt*
 
 ### ================================================================================
 
@@ -3368,9 +3342,9 @@ GG WP
 ================================================================================
 
 
-## 19. What happens to the response time when you get the first digit right?
+## 18. What happens to the response time when you get the first digit right?
 
-## Source: writeups/Time_to_Escalate.txt
+*Source: writeups/Time_to_Escalate.txt*
 
 ```
 The validator checks digits one at a time.
@@ -3579,9 +3553,9 @@ The elves hand you a candy cane with a note:
 csd{T1m1n9_T1M1N9_t1M1n9_1t5_4LL_480UT_tH3_t1m1n9}
 
 
-## 20. Trust Issues CTF Writeup
+## 19. Trust Issues CTF Writeup
 
-## Source: writeups/TrustCTF_writeup.txt
+*Source: writeups/TrustCTF_writeup.txt*
 
 ### ================================================================================
 
@@ -3618,7 +3592,7 @@ STEP 1: Connect to the Custom AWS Endpoint
 ------------------------------------------
 Using boto3 with the provided credentials to connect to the custom endpoint:
 
-‘‘‘python
+```python
 import boto3
 
 endpoint_url = "https://trust-issues.csd.lol"
@@ -3632,13 +3606,13 @@ region_name=’us-east-1’
 sts = session.client(’sts’, endpoint_url=endpoint_url)
 identity = sts.get_caller_identity()
 # Returns: arn:aws:iam::000000000000:root
-‘‘‘
+```
 
 STEP 2: Assume the Starting Role
 --------------------------------
 Assume the role we were assigned (npld-ext-2847):
 
-‘‘‘python
+```python
 assumed = sts.assume_role(
 RoleArn=’arn:aws:iam::000000000000:role/npld-ext-2847’,
 RoleSessionName=’ctf-session’
@@ -3653,7 +3627,7 @@ aws_secret_access_key=assumed[’Credentials’][’SecretAccessKey’],
 aws_session_token=assumed[’Credentials’][’SessionToken’],
 region_name=’us-east-1’
 )
-‘‘‘
+```
 
 STEP 3: Enumerate IAM Permissions
 ---------------------------------
@@ -3729,7 +3703,7 @@ Contents of npld-backup-vault-7f3a:
 - classified/wishlist-backup.txt (53 bytes) <-- FLAG HERE!
 - readme.txt
 
-‘‘‘python
+```python
 s3 = new_session.client(’s3’, endpoint_url=endpoint_url)
 response = s3.get_object(
 Bucket=’npld-backup-vault-7f3a’,
@@ -3737,13 +3711,13 @@ Key=’classified/wishlist-backup.txt’
 )
 content = response[’Body’].read().decode(’utf-8’)
 print(content) # csd{sO_M4NY_VUln3R48L3_7H1Ngs_7H3S3_d4yS_s1gh_bc653}
-‘‘‘
+```
 
 ================================================================================
 COMPLETE SOLUTION CODE
 ================================================================================
 
-‘‘‘python
+```python
 import boto3
 import json
 
@@ -3782,7 +3756,7 @@ Key=’classified/wishlist-backup.txt’
 )
 flag = response[’Body’].read().decode(’utf-8’)
 print(f"FLAG: {flag}")
-‘‘‘
+```
 
 ================================================================================
 VULNERABILITY ANALYSIS
