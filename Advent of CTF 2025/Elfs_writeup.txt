@@ -1,0 +1,157 @@
+NPLD Mainframe Authentication — Reverse Engineering Write-Up
+Challenge Overview
+
+The binary prompts the user for an “access code” and enforces several checks before granting access. At first glance, numeric values and anti-tamper logic appear relevant, but the real validation is a fixed-length XOR-based string comparison.
+
+The goal is to reverse the binary, identify the credential verification logic, and recover the correct access code.
+
+Initial Recon
+
+Running the binary shows:
+
+NPLD Mainframe Authentication
+Enter access code:
+
+
+Invalid inputs produce one of two messages:
+
+Jingle laughs. Wrong credential length!
+
+Access Denied. Jingle smirks.
+
+This already suggests:
+
+A strict length check
+
+A secondary content validation
+
+Entry Point and Control Flow
+
+The ELF entry stub (processEntry) calls __libc_start_main, which leads to the real main function:
+
+UndefinedFunction_00101171
+
+
+This is confirmed by its structure: stack canary setup, I/O, and return value handling.
+
+Anti-Tamper Check
+
+Early in main, the function FUN_00101339 is called:
+
+if (DAT_00104008 != -0x21524111) {
+    puts("Coal for you! Tampering detected.");
+    exit(1);
+}
+
+
+Inspecting the global variable:
+
+DAT_00104008 = 0xDEADBEEF
+
+
+As a signed 32-bit integer:
+
+0xDEADBEEF = -559038737 = -0x21524111
+
+
+This value is already initialized correctly in the binary, meaning:
+
+The anti-tamper check passes by default
+
+This value is not user input
+
+Numeric guessing is irrelevant to solving the challenge
+
+Input Handling and Length Check
+
+User input is read with fgets, newline-stripped, and checked:
+
+if (strlen(input) == 0x17)
+
+
+Key detail:
+
+0x17 = 23 characters
+
+
+Any input not exactly 23 characters long immediately fails with:
+
+Jingle laughs. Wrong credential length!
+
+Credential Validation Logic
+
+If the length check passes, FUN_00101362 is called:
+
+(input[i] ^ 0x42) == DAT_00102110[i]
+
+
+This loop runs for i = 0 .. 22 (23 bytes total).
+
+This is a simple XOR-based comparison. Reversing it gives:
+
+input[i] = DAT_00102110[i] ^ 0x42
+
+
+So the correct access code is obtained by XOR-decoding the bytes stored at DAT_00102110.
+
+Extracting the Encoded Data
+
+Dumping the data from .rodata starting at DAT_00102110 yields:
+
+21 31 26 39 73 2c 36 72 1d 36 2a 71 1d 2f 76 73 2c 24 30 76 2f 71 3f
+
+
+This is exactly 23 bytes, matching the required input length.
+
+Decoding
+
+XOR each byte with 0x42:
+
+Encoded	XOR 0x42	ASCII
+21	63	c
+31	73	s
+26	64	d
+39	7b	{
+73	31	1
+2c	6e	n
+36	74	t
+72	30	0
+1d	5f	_
+36	74	t
+2a	68	h
+71	33	3
+1d	5f	_
+2f	6d	m
+76	34	4
+73	31	1
+2c	6e	n
+24	66	f
+30	72	r
+76	34	4
+2f	6d	m
+71	33	3
+3f	7d	}
+Final Access Code
+csd{1nt0_th3_m41nfr4m3}
+
+Result
+
+Entering the decoded string produces:
+
+Welcome to the mainframe, Operative. Jingle owes the elves a round.
+
+Conclusion
+
+This challenge combines:
+
+A misleading anti-tamper constant (DEADBEEF)
+
+A strict length gate
+
+A straightforward XOR string check
+
+Once the encoded data is identified, the solution is fully deterministic and requires no brute force or patching.
+
+Flag:
+
+csd{1nt0_th3_m41nfr4m3}

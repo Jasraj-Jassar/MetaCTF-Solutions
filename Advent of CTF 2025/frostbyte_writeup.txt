@@ -1,0 +1,80 @@
+Frostbyte CTF Challenge Writeup
+================================
+
+Challenge: frostbyte
+Server: nc ctf.csd.lol 8888
+Flag: csd{f1L3sYSt3M_CFH_1S_l0wK3nu1N3lY_fun_3af185}
+
+Binary Analysis
+---------------
+- ELF 64-bit LSB executable, x86-64
+- No PIE (base address 0x400000)
+- Partial RELRO (GOT is writable)
+- Stack Canary enabled
+- NX enabled
+
+Vulnerability
+-------------
+The binary allows arbitrary 1-byte writes via /proc/self/mem:
+1. Prompts for filename (we use "/proc/self/mem")
+2. Prompts for offset (any address we want to write to)
+3. Prompts for data (1 byte gets written)
+
+The key insight is that /proc/self/mem bypasses normal page protections,
+allowing us to write to the .text section (executable code) even though
+it's mapped as read-execute only.
+
+Exploitation Strategy
+---------------------
+
+Step 1: Create an infinite loop
+  - The program normally exits after one write
+  - At address 0x4013d8, there's a "call puts" instruction: e8 13 fd ff ff
+  - By changing the second byte from 0x13 to 0xd3, it becomes "call _start"
+  - This restarts the program after each write, giving us unlimited writes
+
+Step 2: Write "/bin/sh" to a safe memory location
+  - The filename buffer at 0x4040a0 gets overwritten each iteration
+  - We write "/bin/sh\0" to 0x4041b0 (unused .bss space) instead
+
+Step 3: Inject shellcode at 0x4013dd
+  - This is right after the "call puts" instruction
+  - When puts returns, execution falls through to our shellcode
+  
+  Shellcode (25 bytes):
+    mov rdi, 0x4041b0        ; pointer to "/bin/sh"
+    mov rax, [0x404000]      ; load puts@GOT (resolved libc address)
+    sub rax, 0x2f490         ; calculate system() address (system - puts offset)
+    call rax                 ; system("/bin/sh")
+    leave
+    ret
+
+  Hex: 48c7c7b0414000488b042500404000482d90f40200ffd0c9c3
+
+Step 4: Trigger the shellcode
+  - Restore the original "call puts" byte (0xd3 -> 0x13)
+  - The loop breaks, puts("Write complete.") executes
+  - Execution continues to our shellcode at 0x4013dd
+  - Shell spawns!
+
+Key Addresses
+-------------
+- CALL_PUTS instruction: 0x4013d8 (patch byte at 0x4013d9)
+- Shellcode location:    0x4013dd
+- puts@GOT:              0x404000
+- /bin/sh string:        0x4041b0
+- Libc offsets: puts=0x87be0, system=0x58750, diff=-0x2f490
+
+Final Exploit
+-------------
+See: chall/test_infinite.py
+
+The exploit makes 34 individual 1-byte writes:
+- 1 write to enable the loop
+- 8 writes for "/bin/sh\0"
+- 25 writes for the shellcode
+- 1 write to trigger (restore call puts)
+
+Author's Note (from flag.txt)
+-----------------------------
+"i gave up on theming ts a long time ago :sob: - vipin"

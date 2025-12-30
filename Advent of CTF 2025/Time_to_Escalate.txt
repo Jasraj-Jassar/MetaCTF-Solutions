@@ -1,0 +1,202 @@
+The validator checks digits one at a time.
+
+What happens to the response time when you get the first digit right?
+
+
+Time is more than just a constraint, it's also a clue.
+
+…/oops/Time_To_Escalate ❯ nc ctf.csd.lol 5040
+
+╔════════════════════════════════════════════════════════════╗
+║         NPLD ELEVATOR CONTROL SYSTEM v3.2.1-DEBUG          ║
+╠════════════════════════════════════════════════════════════╣
+║  AUTH: 6-digit PIN required for emergency release          ║
+║  WARNING: 3-second lockout between attempts                ║
+╚════════════════════════════════════════════════════════════╝
+
+
+[Attempt 1/100] Enter 6-digit PIN: 111111
+
+✗ ACCESS DENIED (Debug: 0.416s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 2/100] Enter 6-digit PIN: 211111
+
+✗ ACCESS DENIED (Debug: 0.377s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 3/100] Enter 6-digit PIN: 311111
+
+✗ ACCESS DENIED (Debug: 0.367s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 4/100] Enter 6-digit PIN: 4111111
+ERROR: PIN must be exactly 6 digits.
+
+[Attempt 4/100] Enter 6-digit PIN: 411111
+
+✗ ACCESS DENIED (Debug: 0.404s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 5/100] Enter 6-digit PIN: 511111
+
+✗ ACCESS DENIED (Debug: 0.703s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 6/100] Enter 6-digit PIN: 511111
+
+✗ ACCESS DENIED (Debug: 0.697s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 7/100] Enter 6-digit PIN: 611111
+
+✗ ACCESS DENIED (Debug: 0.419s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 8/100] Enter 6-digit PIN: 711111
+
+✗ ACCESS DENIED (Debug: 0.385s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 9/100] Enter 6-digit PIN: 811111
+
+✗ ACCESS DENIED (Debug: 0.394s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 10/100] Enter 6-digit PIN: 911111
+
+✗ ACCESS DENIED (Debug: 0.394s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 11/100] Enter 6-digit PIN: 511111
+
+✗ ACCESS DENIED (Debug: 0.693s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 12/100] Enter 6-digit PIN: 521111
+
+✗ ACCESS DENIED (Debug: 0.707s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 13/100] Enter 6-digit PIN: 531111
+
+✗ ACCESS DENIED (Debug: 0.702s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 14/100] Enter 6-digit PIN: 541111
+
+✗ ACCESS DENIED (Debug: 1.025s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 15/100] Enter 6-digit PIN: 551111
+
+✗ ACCESS DENIED (Debug: 0.708s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 16/100] Enter 6-digit PIN: 5421111
+ERROR: PIN must be exactly 6 digits.
+
+[Attempt 16/100] Enter 6-digit PIN: 542111
+
+✗ ACCESS DENIED (Debug: 1.026s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 17/100] Enter 6-digit PIN: 543111
+
+✗ ACCESS DENIED (Debug: 1.001s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 18/100] Enter 6-digit PIN: 544111
+
+✗ ACCESS DENIED (Debug: 1.003s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 19/100] Enter 6-digit PIN: 545111
+
+✗ ACCESS DENIED (Debug: 0.975s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 20/100] Enter 6-digit PIN: 546111
+
+✗ ACCESS DENIED (Debug: 1.023s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 21/100] Enter 6-digit PIN: 547111
+
+✗ ACCESS DENIED (Debug: 1.035s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 22/100] Enter 6-digit PIN: 548111
+
+✗ ACCESS DENIED (Debug: 1.316s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 23/100] Enter 6-digit PIN: 549111
+
+✗ ACCESS DENIED (Debug: 1.018s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 24/100] Enter 6-digit PIN: 548211
+
+✗ ACCESS DENIED (Debug: 1.310s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 25/100] Enter 6-digit PIN: 548311
+
+✗ ACCESS DENIED (Debug: 1.321s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 26/100] Enter 6-digit PIN: 548411
+
+✗ ACCESS DENIED (Debug: 1.267s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 27/100] Enter 6-digit PIN: 548511
+
+✗ ACCESS DENIED (Debug: 1.330s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 28/100] Enter 6-digit PIN: 548611
+
+✗ ACCESS DENIED (Debug: 1.275s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 29/100] Enter 6-digit PIN: 548711
+
+✗ ACCESS DENIED (Debug: 1.561s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 30/100] Enter 6-digit PIN: 548721
+
+✗ ACCESS DENIED (Debug: 1.604s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 31/100] Enter 6-digit PIN: 548731
+
+✗ ACCESS DENIED (Debug: 1.924s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 32/100] Enter 6-digit PIN: 548732
+
+✗ ACCESS DENIED (Debug: 1.933s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 33/100] Enter 6-digit PIN: 548733
+
+✗ ACCESS DENIED (Debug: 1.900s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 34/100] Enter 6-digit PIN: 548734
+
+✗ ACCESS DENIED (Debug: 1.898s)
+Lockout engaged. Please wait 3 seconds...
+
+[Attempt 35/100] Enter 6-digit PIN: 548735
+
+✓ ACCESS GRANTED in 1.852s
+
+🎄 ELEVATOR RELEASED! 🎄
+Jingle, Tinsel, and Sprocket have been freed!
+
+The elves hand you a candy cane with a note:
+csd{T1m1n9_T1M1N9_t1M1n9_1t5_4LL_480UT_tH3_t1m1n9}

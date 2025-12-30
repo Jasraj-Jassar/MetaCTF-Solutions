@@ -1,0 +1,200 @@
+================================================================================
+                    CUSTOM PACKAGING CTF WRITEUP
+                    Forensics Challenge Solution
+================================================================================
+
+FLAG: csd{Kr4mPU5_RE4llY_l1ke5_T0_m4kE_EVeRytH1NG_CU5t0m_672Df}
+
+================================================================================
+CHALLENGE OVERVIEW
+================================================================================
+
+We were given a custom encrypted container file (ks_operations.kcf) from the 
+"KRAMPUS SYNDICATE" organization. The challenge provided hints about the 
+encryption scheme used and required us to decrypt and extract files to find 
+the flag.
+
+================================================================================
+FILE ANALYSIS
+================================================================================
+
+The KCF file structure:
+- Magic bytes: "KCF\0"
+- 128-byte header containing metadata
+- File Allocation Table (FAT) with 96-byte entries per file
+- Data region containing encrypted file contents
+
+Header fields parsed:
+- Nonce (16 bytes):     b371c74177fb3cdccc80a16a27738322
+- Timestamp (8 bytes):  1765497600 (December 12, 2025)
+- File count (2 bytes): 168 files
+- FAT offset:           0x80 (128 bytes)
+- Data offset:          0x4000 (16384 bytes)
+- Data size:            5,410,608 bytes
+
+================================================================================
+KEY DERIVATION (FOLLOWING THE HINTS)
+================================================================================
+
+HINT 1 - Master Key Derivation:
+-------------------------------
+master_key = SHA256(nonce || timestamp_LE || file_count_LE || identifier)
+
+Components:
+- nonce:         16 bytes from header (0x08-0x18)
+- timestamp_LE:  8 bytes little-endian from header (0x18-0x20)
+- file_count_LE: 2 bytes little-endian from header (0x20-0x22)
+- identifier:    6 lowercase alphanumeric characters
+
+The identifier "ks2025" was derived from context clues:
+- File was named "ks2025_ops_final.kcf" in the challenge
+- Server naming convention used "ks2025-*" pattern
+- "ks" is the internal reference for KRAMPUS SYNDICATE
+
+Master key material (32 bytes):
+b371c74177fb3cdccc80a16a27738322005b3b6900000000a8006b7332303235
+
+Resulting master key:
+95dbdd24af755276432d8b6c06f3151d7c4102a50a98f14a3b68ddb953ac9048
+
+
+HINT 2 - Per-File Key Derivation:
+---------------------------------
+per_file_key = SHA256(master_key || file_index || file_offset)[:16]
+
+Components:
+- master_key:  32 bytes from HINT 1
+- file_index:  4 bytes little-endian (file number 0, 1, 2, ...)
+- file_offset: 8 bytes little-endian (offset within data region)
+- Truncated to 16 bytes for RC4 key
+
+================================================================================
+FAT STRUCTURE
+================================================================================
+
+Each FAT entry is 96 bytes with the following structure:
+- Bytes 0-3:   CRC32 checksum
+- Bytes 4-7:   File offset (relative to data region start)
+- Bytes 8-11:  Padding (zeros)
+- Bytes 12-15: File size
+- Bytes 16-19: File size (repeated)
+- Bytes 20+:   Additional metadata
+
+================================================================================
+DECRYPTION PROCESS
+================================================================================
+
+1. Parse the KCF header to extract nonce, timestamp, and file count
+
+2. Compute the master key using SHA256 with the identifier "ks2025"
+
+3. Decrypt the FAT using RC4 with the master key
+
+4. For each of the 168 files:
+   a. Read offset and size from the decrypted FAT entry
+   b. Compute per-file key: SHA256(master_key || index_4bytes || offset_8bytes)[:16]
+   c. Extract encrypted data from the data region
+   d. Decrypt using RC4 with the per-file key
+   e. Save the decrypted file
+
+================================================================================
+EXTRACTED FILES
+================================================================================
+
+File type distribution:
+- TEXT files: 115
+- BIN files:  50
+- OLE (DOC):  1
+- PDF:        1
+- JPEG:       1
+
+Total: 168 files
+
+================================================================================
+FLAG LOCATION
+================================================================================
+
+The flag was found in FILE 137 (a text file):
+
+csd{Kr4mPU5_RE4llY_l1ke5_T0_m4kE_EVeRytH1NG_CU5t0m_672Df}
+
+Translation: "Krampus really likes to make everything custom"
+(Fitting for a custom container format challenge!)
+
+================================================================================
+SOLUTION CODE
+================================================================================
+
+```python
+import struct
+import hashlib
+from arc4 import ARC4
+import os
+import re
+
+with open('ks_operations.kcf', 'rb') as f:
+    data = f.read()
+
+# Parse header
+nonce = data[0x08:0x18]
+timestamp_le = data[0x18:0x20]
+file_count_le = data[0x20:0x22]
+file_count = struct.unpack('<H', file_count_le)[0]
+
+FAT_OFFSET = 0x80
+DATA_OFFSET = 0x4000
+
+# Master key derivation (HINT 1)
+identifier = b"ks2025"
+master_key_material = nonce + timestamp_le + file_count_le + identifier
+master_key = hashlib.sha256(master_key_material).digest()
+
+# Decrypt FAT
+fat_size = file_count * 96
+fat_enc = data[FAT_OFFSET:FAT_OFFSET + fat_size]
+cipher = ARC4(master_key)
+fat_dec = cipher.decrypt(fat_enc)
+
+# Parse FAT entries and extract files
+for i in range(file_count):
+    entry = fat_dec[i*96:(i+1)*96]
+    offset = struct.unpack('<I', entry[4:8])[0]
+    size = struct.unpack('<I', entry[12:16])[0]
+    
+    # Per-file key derivation (HINT 2)
+    idx_bytes = struct.pack('<I', i)
+    off_bytes = struct.pack('<Q', offset)
+    file_key = hashlib.sha256(master_key + idx_bytes + off_bytes).digest()[:16]
+    
+    # Decrypt file
+    start = DATA_OFFSET + offset
+    enc_data = data[start:start + size]
+    cipher = ARC4(file_key)
+    dec_data = cipher.decrypt(enc_data)
+    
+    # Search for flag
+    if b'csd{' in dec_data:
+        match = re.search(rb'csd\{[^}]+\}', dec_data)
+        if match:
+            print(f"FLAG: {match.group().decode()}")
+```
+
+================================================================================
+KEY TAKEAWAYS
+================================================================================
+
+1. READ THE HINTS CAREFULLY - The hints provided the exact key derivation 
+   formulas. Following them precisely was the solution.
+
+2. CONTEXT CLUES MATTER - The identifier "ks2025" was derivable from the 
+   challenge context (filename patterns, organization reference).
+
+3. DON'T BRUTE FORCE UNNECESSARILY - The challenge was solvable by logic 
+   and careful analysis, not by exhaustive search.
+
+4. UNDERSTAND THE CRYPTO - RC4 + SHA256 is a simple but effective scheme.
+   The per-file key derivation prevents known-plaintext attacks across files.
+
+================================================================================
+                              END OF WRITEUP
+================================================================================

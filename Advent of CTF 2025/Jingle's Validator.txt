@@ -1,0 +1,423 @@
+================================================================================
+                         JINGLE'S VALIDATOR
+                   or: "Military-Grade" Meets Mathematics
+                      A Tale of Hubris and Custom VMs
+================================================================================
+
+Challenge: NPLD Tool Suite License Validator (jollyvm)
+Category: Reverse Engineering
+Flag: csd{I5_4ny7HiN9_R34LlY_R4Nd0m_1F_it5_bru73F0rc4B1e?}
+
+================================================================================
+                           THE EMAIL THREAD
+================================================================================
+
+From: Jingle McSnark <jingle@northpole.internal>
+To: licensing-dept@northpole.internal
+Subject: New Validator - DO NOT QUESTION
+
+    Attached is the new offline license validator for internal tools.
+    I spent THREE WEEKS on this. It's military-grade. Uncrackable.
+    
+    Don't bother with code review. You wouldn't understand it anyway.
+    
+    - Jingle
+
+---
+
+From: Snowdrift <snowdrift@northpole.internal>
+To: licensing-dept@northpole.internal
+Subject: RE: New Validator - DO NOT QUESTION
+
+    Let me know when you want a second opinion.
+    
+    - Snowdrift
+
+---
+
+[Jingle has not responded]
+
+================================================================================
+                        INITIAL RECONNAISSANCE
+================================================================================
+
+    $ file jollyvm
+    jollyvm: ELF 64-bit LSB pie executable, x86-64, stripped
+
+    $ ./jollyvm
+    [*] NPLD Tool Suite v2.4.1
+    Enter license key: test1234
+    [-] Invalid license key.
+
+A stripped 64-bit binary. License key validation. Jingle thinks it's uncrackable.
+
+Challenge accepted.
+
+================================================================================
+                      THE FIRST CLUE: LENGTH CHECK
+================================================================================
+
+Looking at the disassembly:
+
+    124d:   cmp    $0x34,%rax    ; Compare input length to 0x34 (52)
+    1251:   je     1289          ; Jump if equal (continue validation)
+    1253:   lea    "Invalid"...  ; Otherwise, reject
+
+The license key is exactly 52 characters. That's suspiciously flag-sized.
+Let me guess: csd{...} with 48 characters inside the braces.
+
+    c s d { [48 characters of "randomness"] }
+    1 + 1 + 1 + 1 + 48 + 1 = 52 ✓
+
+================================================================================
+                       THE HORROR: A CUSTOM VM
+================================================================================
+
+Deeper in the binary, I found something terrifying:
+
+    1350:   lea    (%rdx,%rdx,2),%rax
+    1354:   lea    (%r9,%rax,2),%rax     ; Calculate bytecode address
+    1364:   cmpb   $0x16,(%rax)          ; Check opcode range (0x00-0x16)
+    136c:   movslq (%r8,%rax,4),%rax     ; Jump table lookup
+    1373:   notrack jmp *%rax            ; Execute handler
+
+Jingle built a CUSTOM VIRTUAL MACHINE for license validation.
+
+This isn't just overengineering. This is a cry for help.
+
+The VM has:
+  - 23 different opcodes (0x00 - 0x16)
+  - Multiple registers (r0-r12 in VM terms)
+  - Bytecode stored at offset 0x2120
+  - A "key" array stored at offset 0x20e0
+
+================================================================================
+                      REVERSING THE VM OPCODES
+================================================================================
+
+After staring at the jump table handlers, I mapped out the instruction set:
+
+    OPCODE  MNEMONIC     OPERATION
+    ------  --------     ---------
+    0x00    MOV_IMM      reg[A] = immediate
+    0x01    MOV_REG      reg[A] = reg[B]
+    0x02    ADD_IMM      reg[A] += immediate
+    0x03    ADD_REG      reg[A] += reg[B]
+    0x04    SUB_IMM      reg[A] -= immediate
+    0x05    SUB_REG      reg[A] -= reg[B]
+    0x06    XOR_REG      reg[A] ^= reg[B]
+    0x07    OR_REG       reg[A] |= reg[B]
+    0x08    SHL_REG      reg[A] = reg[B] << imm
+    0x09    SHR_REG      reg[A] = reg[B] >> imm
+    0x0a    AND_IMM      reg[A] &= immediate
+    0x0b    LD_INPUT     reg[A] = input[reg[B] + offset]
+    0x0c    ST_OUTPUT    output[offset] = reg[A]
+    0x0d    LD_OUTPUT    reg[A] = output[offset]
+    0x0e    LD_KEY       reg[A] = key[offset]
+    0x0f    CMP_LT       flag = reg[A] < immediate
+    0x10    CMP_EQ       flag = reg[A] == immediate
+    0x11    CMP_REG      flag = reg[A] == reg[B]
+    0x12    JMP          goto address
+    0x13    JT           if flag: goto address
+    0x14    JF           if !flag: goto address
+    0x15    SET_RET      set return value
+    0x16    HALT         stop execution
+
+Each instruction is 6 bytes: opcode(1) + arg1(1) + arg2(1) + pad(1) + imm16(2)
+
+Jingle... you built a whole CPU architecture for a license check?!
+
+================================================================================
+                    DISASSEMBLING THE BYTECODE
+================================================================================
+
+After writing a disassembler, the algorithm became clear:
+
+    ; Initialize LFSR state from input bytes 48-51
+    0:  CMP_LT    flag = r0 < 4
+    1:  JT        if flag: goto 5
+    2:  MOV_REG   r2 = r0          ; r0 = input length (52)
+    3:  SUB_IMM   r2 -= 4          ; r2 = 48
+    ...
+    9:  LD_INPUT  r5 = input[48]   ; Load last 4 bytes
+    15: SHL_REG   r5 = r5 << 8     ; Pack into 32-bit state
+    ...
+
+    ; The LFSR feedback function (repeated many times):
+    28: SHR_REG   r4 = r4 >> 3
+    30: SHR_REG   r5 = r5 >> 5
+    31: XOR_REG   r4 ^= r5
+    33: SHR_REG   r5 = r5 >> 8
+    34: XOR_REG   r4 ^= r5
+    36: SHR_REG   r5 = r5 >> 12
+    37: XOR_REG   r4 ^= r5
+    38: AND_IMM   r4 &= 0xff
+
+    ; Main encryption loop:
+    ; For each position, XOR input with keystream, store to output
+    78: LD_INPUT  r5 = input[pos]
+    79: SHR_REG   r6 = state >> 0
+    80: AND_IMM   r6 &= 0xff
+    81: XOR_REG   r7 = r5 ^ r6     ; output = input XOR keystream
+    82: ST_OUTPUT output[pos] = r7
+
+    ; Final comparison:
+    146: LD_OUTPUT r5 = output[i]
+    147: LD_KEY    r6 = key[i]
+    148: CMP_REG   flag = r5 == r6  ; output must match stored key
+    149: JF        if !flag: FAIL
+
+================================================================================
+                    THE CRYPTOGRAPHIC INSIGHT
+================================================================================
+
+Jingle implemented a LINEAR FEEDBACK SHIFT REGISTER (LFSR) stream cipher!
+
+The algorithm:
+  1. Initialize 32-bit state from input[48:52] (last 4 bytes)
+  2. Generate keystream using LFSR: new_byte = (s>>3)^(s>>5)^(s>>8)^(s>>12)
+  3. XOR each input byte with keystream to produce output
+  4. Compare output against stored expected value at 0x20e0
+
+The critical flaw: XOR IS REVERSIBLE!
+
+If we know:
+  - The expected output (stored in binary)
+  - The flag format (csd{...})
+  
+Then we can DERIVE the keystream and work backwards!
+
+================================================================================
+                         THE MATHEMATICAL ATTACK
+================================================================================
+
+Expected output (52 bytes at 0x20e0):
+    3c 6f 53 88 d5 f6 00 28 b5 bc ab 8b 4d a6 e2 9a
+    5b 57 10 a4 59 d9 56 36 01 04 51 b0 e1 e2 04 0c
+    e2 35 f8 88 6a 2c cf 29 ea 2e 73 7e 2a cc e9 5f
+    54 35 67 d2
+
+Known plaintext (flag prefix):
+    input[0:4] = "csd{" = [0x63, 0x73, 0x64, 0x7b]
+
+Therefore:
+    keystream[0:4] = expected[0:4] XOR input[0:4]
+                   = [0x3c, 0x6f, 0x53, 0x88] XOR [0x63, 0x73, 0x64, 0x7b]
+                   = [0x5f, 0x1c, 0x37, 0xf3]
+
+The keystream comes from the LFSR state after one advance. So:
+    state_after_advance = 0xf3371c5f
+
+Working backwards through the LFSR:
+    state_after = (init_state << 8) | lfsr_byte(init_state)
+    
+    init_state[23:0] = state_after[31:8] = 0xf3371c
+    
+    Now brute-force init_state[31:24] (only 256 possibilities!)
+
+Found: init_state = 0x00f3371c
+
+This means input[48:52] = [0x1c, 0x37, 0xf3, 0x00]
+
+================================================================================
+                      RECOVERING THE FULL KEY
+================================================================================
+
+With the initial state known, run the LFSR forward and XOR each expected
+output byte with the keystream to recover the plaintext:
+
+    def recover_input(init_state, expected):
+        state = init_state
+        recovered = []
+        
+        for pos in range(0, 52, 4):
+            state = advance_lfsr(state)  # Generate keystream
+            for j in range(min(4, 52 - pos)):
+                ks_byte = (state >> (j * 8)) & 0xff
+                input_byte = expected[pos + j] ^ ks_byte
+                recovered.append(input_byte)
+            # Feed plaintext back into LFSR for self-sync
+            state = update_with_plaintext(state, recovered[-4:])
+        
+        return bytes(recovered)
+
+Result:
+    csd{I5_4ny7HiN9_R34LlY_R4Nd0m_1F_it5_bru73F0rc4B1e?}
+
+================================================================================
+                          VERIFICATION
+================================================================================
+
+    $ echo 'csd{I5_4ny7HiN9_R34LlY_R4Nd0m_1F_it5_bru73F0rc4B1e?}' | ./jollyvm
+    [*] NPLD Tool Suite v2.4.1
+    Enter license key: [+] License valid.
+
+*chef's kiss*
+
+================================================================================
+                    WHY JINGLE'S "MILITARY-GRADE" FAILED
+================================================================================
+
+Let's count the ways:
+
+1. CUSTOM VM DOESN'T MEAN SECURE
+   Obfuscation is not encryption. Once I understood the opcodes, the 
+   algorithm was completely transparent.
+
+2. XOR STREAM CIPHER WITH KNOWN PLAINTEXT
+   "csd{" at the start gives us 4 bytes of known plaintext. That's enough
+   to derive the keystream and work backwards to the initial state.
+
+3. SMALL STATE SPACE
+   The LFSR state is only 32 bits. Even without the known-plaintext attack,
+   2^32 brute force is feasible.
+
+4. DETERMINISTIC EVERYTHING
+   Same input always produces same output. No salt, no IV, no randomness.
+   Once cracked, cracked forever.
+
+5. STORING THE EXPECTED OUTPUT IN THE BINARY
+   Literally handed us the answer key!
+
+================================================================================
+                     WHAT JINGLE SHOULD HAVE DONE
+================================================================================
+
+For an offline license validator:
+
+    import hashlib
+    import hmac
+    
+    def validate_license(key, secret):
+        # Split key into data and checksum
+        data, checksum = key[:-8], key[-8:]
+        
+        # Compute expected checksum
+        expected = hmac.new(secret, data.encode(), hashlib.sha256)
+        
+        # Constant-time comparison
+        return hmac.compare_digest(expected.hexdigest()[:8], checksum)
+
+Or better yet: use asymmetric crypto (RSA/ECDSA signatures) so even having
+the validator binary doesn't help you forge licenses.
+
+But instead, Jingle built a custom VM running a broken stream cipher with
+the answer embedded in the binary.
+
+"Military-grade" indeed. 🎖️
+
+================================================================================
+                        THE AFTERMATH
+================================================================================
+
+From: Security Team
+To: licensing-dept@northpole.internal
+Subject: RE: RE: New Validator - DO NOT QUESTION
+
+    We've completed our review of the "military-grade" validator.
+    
+    Findings:
+    - Custom VM: Impressive but unnecessary
+    - LFSR stream cipher: Textbook implementation, textbook vulnerability
+    - Hardcoded expected output: Not how cryptography works
+    - Time to crack: About 20 minutes including coffee break
+    
+    Recommendation: Accept Snowdrift's offer for a second opinion.
+    
+    Also, we found the flag: 
+    csd{I5_4ny7HiN9_R34LlY_R4Nd0m_1F_it5_bru73F0rc4B1e?}
+    
+    Translation: "Is anything really random if it's bruteforceable?"
+    
+    The answer is no, Jingle. The answer is no.
+
+---
+
+From: Jingle McSnark
+To: licensing-dept@northpole.internal
+Subject: Out of Office
+
+    I will be away from email for an indefinite period.
+    
+    For urgent matters, please contact literally anyone else.
+
+================================================================================
+                           SOLVE SCRIPT
+================================================================================
+
+    #!/usr/bin/env python3
+    """JollyVM License Key Recovery"""
+
+    expected = bytes([
+        0x3c, 0x6f, 0x53, 0x88, 0xd5, 0xf6, 0x00, 0x28,
+        0xb5, 0xbc, 0xab, 0x8b, 0x4d, 0xa6, 0xe2, 0x9a,
+        0x5b, 0x57, 0x10, 0xa4, 0x59, 0xd9, 0x56, 0x36,
+        0x01, 0x04, 0x51, 0xb0, 0xe1, 0xe2, 0x04, 0x0c,
+        0xe2, 0x35, 0xf8, 0x88, 0x6a, 0x2c, 0xcf, 0x29,
+        0xea, 0x2e, 0x73, 0x7e, 0x2a, 0xcc, 0xe9, 0x5f,
+        0x54, 0x35, 0x67, 0xd2
+    ])
+
+    def lfsr_byte(state):
+        return ((state >> 3) ^ (state >> 5) ^ (state >> 8) ^ (state >> 12)) & 0xff
+
+    def advance_state(state):
+        return ((state << 8) | lfsr_byte(state)) & 0xffffffff
+
+    # Known plaintext attack using "csd{" prefix
+    known_prefix = b'csd{'
+    ks = [expected[i] ^ known_prefix[i] for i in range(4)]
+    state_after = ks[0] | (ks[1] << 8) | (ks[2] << 16) | (ks[3] << 24)
+
+    # Recover initial state (brute force high byte)
+    init_partial = (state_after >> 8) & 0xffffff
+    target_low = state_after & 0xff
+
+    for high in range(256):
+        init_state = (high << 24) | init_partial
+        if lfsr_byte(init_state) == target_low:
+            break
+
+    # Decrypt
+    state, result = init_state, []
+    for pos in range(0, 52, 4):
+        state = advance_state(state)
+        word = 0
+        for j in range(min(4, 52 - pos)):
+            ks_byte = (state >> (j * 8)) & 0xff
+            pt_byte = expected[pos + j] ^ ks_byte
+            result.append(pt_byte)
+            word |= pt_byte << (j * 8)
+        pt_lfsr = ((word >> 3) ^ (word >> 5) ^ (word >> 8) ^ (word >> 12)) & 0xff
+        state = ((state << 8) | pt_lfsr) & 0xffffffff
+
+    print(bytes(result).decode())
+
+================================================================================
+                           FINAL STATS
+================================================================================
+
+    Lines of VM bytecode:        155 instructions
+    Time to reverse opcodes:     45 minutes
+    Time to understand cipher:   15 minutes
+    Time to crack:               5 minutes
+    Look on Jingle's face:       Priceless
+
+================================================================================
+                          LESSONS LEARNED
+================================================================================
+
+1. Custom VMs add complexity, not security
+2. XOR stream ciphers need proper key derivation
+3. Never store the expected output in the binary
+4. Known plaintext attacks are devastating
+5. Always get a code review (thanks, Snowdrift)
+6. "Military-grade" is a marketing term, not a security guarantee
+
+Flag: csd{I5_4ny7HiN9_R34LlY_R4Nd0m_1F_it5_bru73F0rc4B1e?}
+
+Snowdrift sends their regards. 🎄
+
+================================================================================
+                              GG WP
+================================================================================

@@ -1,0 +1,25 @@
+Challenge: Drone Control (Reverse / Network)
+
+The provided binary revealed a custom binary protocol used to control a drone network.
+Each connection starts with a HELLO message, after which the server reports a current
+node (CUR) and a list of neighboring nodes. Nodes form a graph with ~1000 total nodes.
+
+Requesting the flag before reaching the goal returns a message of the form:
+“Reach 0xXXXXXXXX to get the flag”.
+This target node is generated per connection.
+
+Solution approach:
+1. Reverse the client to understand the protocol (HELLO, CUR query, MOVE, FLAG).
+2. Observe that CUR values are node IDs, not coordinates.
+3. On each connection:
+   - Send HELLO
+   - Request the flag once to extract the target node ID
+   - Walk the graph by moving to neighbors
+   - Prefer least-visited neighbors to avoid cycles
+4. When CUR equals the target node, request the flag again.
+
+Because the graph is small (≤1000 nodes) and the server allows reconnects,
+systematic exploration guarantees reaching the target.
+
+Final Flag:
+csd{h00r4y_now_U_h4v3_a_dr0ne_army_5846a7b30c}

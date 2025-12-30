@@ -1,0 +1,96 @@
+Re-Key-very - Cryptography Challenge Writeup
+=============================================
+
+Challenge Description:
+----------------------
+The Krampus Syndicate claims their signing service uses "bitcoin-level encryption"
+with secp256k1 elliptic curve cryptography. Given a transcript of signed messages,
+recover the private signing key.
+
+Files Provided:
+---------------
+- gen.py: The signing script
+- out.txt: Three signed messages with their signatures
+
+Vulnerability Analysis:
+-----------------------
+The code generates ECDSA signatures on secp256k1. Looking at the key parts:
+
+    k = random.randint(0, n - 1)  # Nonce generated ONCE
+    
+    for m in msgs:
+        r, s = sign(m, k, d)
+        ...
+        k += 1  # Nonce only incremented by 1!
+
+The nonces are SEQUENTIAL: k, k+1, k+2 for the three signatures.
+This is a classic "related nonce" vulnerability in ECDSA!
+
+The Math:
+---------
+ECDSA signature: s = k^(-1) * (z + r*d) mod n
+
+For two signatures with nonces k and k+1:
+  s1 * k = z1 + r1 * d  (mod n)
+  s2 * (k+1) = z2 + r2 * d  (mod n)
+
+Expanding the second equation:
+  s2 * k + s2 = z2 + r2 * d
+
+Substituting k from first equation:
+  k = (z1 + r1*d) * s1^(-1)
+
+Into second:
+  s2 * (z1 + r1*d) * s1^(-1) + s2 = z2 + r2*d
+
+Solving for d:
+  d = (s1*z2 - s2*z1 - s2*s1) * (s2*r1 - s1*r2)^(-1) mod n
+
+Solution:
+---------
+import hashlib
+
+n = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
+
+def inv_mod(k, p):
+    return pow(k, p - 2, p)
+
+# From out.txt
+msg1 = b'Beware the Krampus Syndicate!'
+r1 = int('a4312e31e6803220d694d1040391e8b7cc25a9b2592245fb586ce90a2b010b63', 16)
+s1 = int('e54321716f79543591ab4c67e989af3af301e62b3b70354b04e429d57f85aa2e', 16)
+z1 = int.from_bytes(hashlib.sha256(msg1).digest(), 'big')
+
+msg2 = b'Santa is watching...'
+r2 = int('6c5f7047d21df064b3294de7d117dd1f7ccf5af872d053f12bddd4c6eb9f6192', 16)
+s2 = int('1ccf403d4a520bc3822c300516da8b29be93423ab544fb8dbff24ca0e1368367', 16)
+z2 = int.from_bytes(hashlib.sha256(msg2).digest(), 'big')
+
+# Solve for private key d
+numerator = (s1 * z2 - s2 * z1 - s2 * s1) % n
+denominator = (s2 * r1 - s1 * r2) % n
+d = (numerator * inv_mod(denominator, n)) % n
+
+# Reverse the transformation: d = (original % (n - 1)) + 1
+original = d - 1
+flag = original.to_bytes((original.bit_length() + 7) // 8, 'big')
+print(flag.decode())
+
+Verification:
+-------------
+- Recovered k matches R1.x == r1 ✓
+- Recovered k+1 matches R2.x == r2 ✓
+- The private key decodes to valid ASCII ✓
+
+Flag:
+-----
+csd{pr3d1ct4bl3_n0nc3_==_w34k}
+
+Key Insights:
+-------------
+1. ECDSA is only secure if nonces are random and independent
+2. Sequential nonces (k, k+1, k+2) allow algebraic recovery of private key
+3. The comment "gonna change nonces!" was sarcastic - k += 1 is not enough
+4. This is why RFC 6979 exists: deterministic but unpredictable nonces
+5. "Bitcoin-level encryption" means nothing if implementation is flawed
+6. Flag translates to: "predictable nonce == weak"

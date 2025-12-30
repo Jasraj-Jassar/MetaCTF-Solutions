@@ -1,0 +1,121 @@
+Krampus DNS Shenanigans – How I Got the Flag
+===========================================
+
+This challenge pretends to be “serious threat intel”, but really it’s a
+breadcrumb hunt hidden entirely inside DNS records. No exploits, no scans,
+just digging… literally.
+
+Step 1 – Start at the top (and immediately get blocked)
+--------------------------------------------------------
+I first tried the usual lazy approach (ANY record), but nope – RFC 8482 says
+“nice try”. So I asked nicely for TXT records instead:
+
+    dig krampus.csd.lol TXT
+
+The TXT record wasn’t the flag. It was SPF. Annoying.
+But SPF mentioned `_spf.krampus.csd.lol`, which felt like a “follow me” sign.
+
+Conclusion: this is not the flag, this is directions.
+
+Step 2 – DMARC snitches on its coworkers
+----------------------------------------
+Next obvious place: DMARC. DMARC configs love to leak internal addresses.
+
+    dig _dmarc.krampus.csd.lol TXT
+
+Boom. There it is:
+    ruf=mailto:forensics@ops.krampus.csd.lol
+
+If a domain literally tells you “ops”, you listen.
+
+Step 3 – Ops talks too much
+---------------------------
+So I checked what ops was saying about itself:
+
+    dig ops.krampus.csd.lol TXT
+
+It casually mentions:
+    _metrics._tcp.krampus.csd.lol
+
+Great. Now we’re doing service discovery like it’s 2005.
+
+Step 4 – SRV records: because why not
+-------------------------------------
+SRV records map services to hosts, so let’s resolve it:
+
+    dig _metrics._tcp.krampus.csd.lol SRV
+
+Result points to:
+    beacon.krampus.csd.lol
+
+At this point I’m 100% sure this domain is gossiping.
+
+Step 5 – The beacon beacons
+---------------------------
+Naturally, I ask the beacon what it knows:
+
+    dig beacon.krampus.csd.lol TXT
+
+It replies with a suspicious base64 blob:
+    ZXhmaWwua3JhbXB1cy5jc2QubG9s==
+
+That’s not English. Time to decode.
+
+Step 6 – Base64 confession
+--------------------------
+Decoded it:
+
+    printf 'ZXhmaWwua3JhbXB1cy5jc2QubG9s==' | base64 -d
+
+Output:
+    exfil.krampus.csd.lol
+
+Ah yes. “exfil”. Very subtle, Krampus.
+
+Step 7 – Exfil points to DKIM
+-----------------------------
+Check exfil’s TXT record:
+
+    dig exfil.krampus.csd.lol TXT
+
+It says:
+    selector=syndicate
+
+That’s a DKIM selector. Mail security saving the day again.
+
+Step 8 – DKIM spills the secret
+-------------------------------
+Pull the DKIM record:
+
+    dig syndicate._domainkey.krampus.csd.lol TXT
+
+Inside the DKIM record is a `p=` value that looks *very* base64-ish.
+
+Decoded it:
+
+    printf 'Y3Nke2RuNV9tMTlIVF9CM19LMU5ENF9XME5LeX0=' | base64 -d
+
+Output:
+    csd{dn5_m19HT_B3_K1ND4_W0NKy}
+
+That’s clearly a flag… but not quite the right wrapper.
+
+Step 9 – Final formatting (CTF realism)
+---------------------------------------
+The challenge wants the flag format:
+    0ops{...}
+
+So we keep the body and change the wrapper.
+
+FINAL FLAG
+----------
+    0ops{dn5_m19HT_B3_K1ND4_W0NKy}
+
+Lessons Learned
+---------------
+- DNS talks more than people think
+- TXT records are the snitch of the internet
+- Mail security configs are basically diaries
+- If you see base64, decode it. Always.
+
+End of suffering.

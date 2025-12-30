@@ -1,0 +1,178 @@
+Failed_Exfil Write-up (Format String → Recover Admin Code → Dump Metadata)
+Summary
+
+The service exposes a simple command interface (write, read, admin, quit) behind a proof-of-work (PoW) gate. The admin command prints a hidden metadata string only if the user supplies a correct 32-bit secret code. That secret is generated at runtime and never shown directly.
+
+A format string vulnerability in the read/write path allows leaking raw 64-bit stack values via %p. Because the admin secret is only 32 bits, it is embedded inside a leaked 64-bit stack word. Extracting the correct 32-bit half (upper 4 bytes), converting it to a signed integer, and supplying it to admin reveals the metadata (the “exfiltrated” data).
+
+1. Proof-of-Work Gate
+
+Connecting to the endpoint requires completing PoW:
+
+nc ctf.csd.lol 7777
+
+
+The server prints a command like:
+
+proof of work:
+curl -sSfL https://pwn.red/pow | sh -s s.AAAAAw==.<challenge>
+solution:
+
+
+Run the given command locally and paste the output token back into the solution: prompt.
+
+Important: PoW challenges are per-connection. Reusing a token from a previous connection results in:
+
+incorrect proof of work
+
+2. Command Interface
+
+After PoW success, the server enters a loop:
+
+cmd:
+
+
+Valid commands (from decompilation / reversing):
+
+write → store attacker-controlled data
+
+read → output stored data
+
+admin → prompt for auth: and print metadata if correct
+
+quit → exit
+
+3. Admin Auth Logic (32-bit Secret)
+
+The admin handler (decompiled) behaves like:
+
+printf("auth: ");
+fgets(buf, 0x100, stdin);
+u = strtoul(buf, 0, 10);
+x = (int)u;
+if (x == secret) puts(metadata);
+else puts("denied");
+
+
+Key points:
+
+The secret is compared as an int → 32-bit value.
+
+Input must be decimal (base 10), since it uses strtoul(..., 10).
+
+The user input is cast to int before comparison, meaning signedness can matter.
+
+The secret is generated once per process:
+
+srand(time(NULL));
+secret = FUN_004011c0();
+
+
+So it changes between runs.
+
+4. Format String Vulnerability
+
+The challenge is solvable because user-controlled data is printed with printf unsafely somewhere in the read/write path, effectively:
+
+printf(user_data);   // vulnerable
+
+
+Instead of the safe form:
+
+printf("%s", user_data);
+
+
+This allows leaking stack values using format specifiers like %p.
+
+5. Leaking Stack Values
+
+To trigger the bug reliably:
+
+Use write to store a payload containing positional %p specifiers.
+
+Use read to print it back and capture the leaked stack words.
+
+Example payload:
+
+LEAK %1$p %2$p %3$p ... %20$p
+
+
+Example output (real leak):
+
+LEAK 0x7ffeecce26d0 0x40159a 0x47916a34ecce27f8 ...
+
+
+On x86_64, %p prints 8 bytes (64 bits) from the stack per specifier.
+
+6. Extracting the 32-bit Secret From a 64-bit Leak
+
+The hints indicate that the leaked 8-byte value contains the 4-byte secret, and specifically that it is in the upper 4 bytes of the 64-bit leak.
+
+Given a leak:
+
+0x47916a34ecce27f8
+
+
+Split into halves:
+
+Upper 32 bits: 0x47916a34
+
+Lower 32 bits: 0xecce27f8
+
+The secret is:
+
+secret32 = upper32 = 0x47916a34
+
+
+Then convert to decimal:
+
+0x47916a34 = 1200712244
+
+
+Since admin compares an int, treat it as a signed 32-bit integer if needed:
+
+If upper32 >= 0x80000000, the correct decimal will be negative.
+
+7. Authenticate and Dump Metadata
+
+After computing the secret as decimal, authenticate:
+
+cmd: admin
+auth: 1200712244
+
+
+On success, the server prints metadata, which contains the exfiltrated information / flag content.
+
+8. Why This Works
+
+The PoW just slows brute force; it doesn’t prevent exploitation.
+
+The admin secret is a 32-bit int.
+
+The format string bug leaks 64-bit stack slots.
+
+The secret is stored in (or adjacent to) one of these 64-bit words.
+
+Extracting the correct 32-bit half gives the exact value admin compares against.
+
+9. Notes and Practical Tips
+
+Don’t type format strings at cmd:—that prompt only accepts write/read/admin/quit. Payload must be given where the program expects data (e.g., after write).
+
+Leaks will vary per run, so compute the admin code fresh each time.
+
+When choosing the right leaked word, “interesting” candidates often look unlike normal pointers (not all 0x7ffe... stack addresses or 0x7f... library addresses). In the sample above, 0x47916a34ecce27f8 stood out.
+
+Minimal Reproduction Steps
+
+Connect and solve PoW
+
+write payload: LEAK %1$p ... %20$p
+
+read → capture leaks
+
+Find the correct 64-bit leak word and extract upper 32 bits
+
+Convert to signed decimal
+
+admin → enter decimal → print metadata

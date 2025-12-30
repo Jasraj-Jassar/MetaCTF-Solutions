@@ -1,0 +1,181 @@
+Packet Tracer – Activity Grader
+Network Configuration & Hardening Write-Up
+Objective
+
+Configure and secure a small enterprise network in Cisco Packet Tracer, achieving at least 90% completion in the Activity Grader by correctly implementing addressing, VLANs, routing, security, ACLs, and device hardening.
+
+1. IP Addressing & Subnetting
+Branch LAN Subnetting (192.168.100.0/24)
+
+The /24 block was divided into two /26 subnets:
+
+VLAN 10 (Staff)
+
+Network: 192.168.100.0/26
+
+Gateway: 192.168.100.1
+
+Purpose: Internal staff access
+
+VLAN 20 (Guest)
+
+Network: 192.168.100.64/26
+
+Gateway: 192.168.100.65
+
+Purpose: Restricted guest access
+
+WAN Links
+
+HQ ↔ ISP: 10.0.0.0/30
+
+HQ: 10.0.0.1
+
+ISP: 10.0.0.2
+
+Branch ↔ ISP: 10.0.0.4/30
+
+Branch: 10.0.0.5
+
+ISP: 10.0.0.6
+
+2. Switch Security (Layer 2)
+Branch Switch
+
+Created VLANs:
+
+VLAN 10 – Staff
+
+VLAN 20 – Guest
+
+Configured Fa0/1 as an 802.1Q trunk to the Branch Router
+
+Disabled DTP using switchport nonegotiate
+
+Access ports:
+
+Fa0/2 → VLAN 10
+
+Fa0/3 → VLAN 20
+
+Port Security:
+
+Enabled on Fa0/2 and Fa0/3
+
+Maximum 1 MAC address
+
+Sticky MAC learning
+
+Violation mode set to restrict
+
+All unused FastEthernet ports administratively shut down
+
+HQ Switch
+
+Server connected to Fa0/2, left in VLAN 1 (default)
+
+Router uplink configured as an access port in VLAN 1
+
+Switch hostname set correctly
+
+3. Routing & Connectivity (Layer 3)
+OSPF Configuration
+
+OSPF Process ID: 1
+
+Area: 0
+
+Configured on:
+
+HQ Router
+
+Branch Router
+
+ISP Router
+
+Network Advertisement
+
+Branch Router advertised:
+
+10.0.0.4/30
+
+192.168.100.0/24 (single network statement covering both VLANs)
+
+HQ Router advertised:
+
+10.0.0.0/30
+
+172.16.10.0/24 (HQ LAN)
+
+ISP Router advertised both WAN subnets
+
+Security
+
+MD5 authentication enabled globally for Area 0
+
+Key ID: 1
+
+Key: Cisc0Rout3s
+
+MD5 keys applied on WAN interfaces only
+
+Passive Interfaces
+
+LAN-facing Gigabit interfaces configured as passive
+
+Prevented OSPF updates from being sent toward switches
+
+4. Access Control Lists (ACLs)
+Named Extended ACL: SECURE_HQ
+
+Configured on the HQ Router with the following rules:
+
+Permit HTTP traffic from Branch VLAN 10 to the HQ Server
+
+Permit ICMP (ping) from Branch VLAN 10 to the HQ Server
+
+Deny all IP traffic from Branch VLAN 20 to the HQ LAN
+
+Permit all other traffic
+
+Application
+
+ACL applied outbound on the HQ Router’s LAN interface
+
+Filters traffic as it exits toward the HQ Server network
+
+5. Device Hardening
+
+Applied to all routers (HQ, Branch, ISP):
+
+Enable secret set to: Hard3n3d!
+
+Local user created:
+
+Username: NetOps
+
+Secret: AdminPass
+
+SSH configuration:
+
+Domain name: nexus.corp
+
+RSA key size: 1024 bits
+
+SSH version 2 only
+
+VTY lines:
+
+Login local
+
+SSH-only access
+
+HTTP and HTTPS servers disabled where supported
+
+Result
+
+All required configurations were completed according to the instructions.
+The Activity Grader score exceeded the required threshold, and the flag was successfully obtained.
+
+Status: Solved
+Tool Used: Cisco Packet Tracer v9.0.0

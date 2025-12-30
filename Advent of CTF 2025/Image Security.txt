@@ -1,0 +1,176 @@
+Image Security Walkthrough (86/100)
+
+
+Getting Ready
+- I logged in as local admin, made sure C:\aeacus\phocus.exe existed, and opened an elevated PowerShell plus the usual GUIs (secpol.msc, services.msc, wf.msc, gpedit.msc when present, regedit when needed).
+
+Accounts and Password Hygiene
+- In Computer Management → Local Users and Groups, I disabled Guest/Default/WDAG and removed unknowns from Administrators, Remote Desktop Users, and Remote Management Users. I kept only Santa/Elf1-4/Administrator as admins and Buddy/Kevin/Frosty as standard. Any extra locals were disabled.
+- In each user’s properties I unchecked “Password never expires.”
+- In secpol.msc → Account Policies → Password Policy, I set: minimum length 12, maximum age 60 days, minimum age 1 day, password history 5. In Account Lockout Policy: threshold 3, duration 30 minutes, reset window 30 minutes.
+
+Local Security Options
+- In secpol.msc → Local Policies → Security Options, I set: Do not display last user = Enabled; Interactive logon: Ctrl+Alt+Del required = Enabled; Machine inactivity limit = 600 seconds; Legal banner caption/text set.
+- Still in Security Options, I set: Accounts: Limit local account use of blank passwords = Enabled; Network security: LAN Manager auth level = Send NTLMv2 only; Network security: Do not store LAN Manager hash = Enabled; Network access: Do not allow anonymous enumeration of SAM/Accounts = Enabled; Network access: Do not allow anonymous enumeration of SAM accounts and shares = Enabled; Network security: Restrict NTLM: NTLMv1 = Deny. SMB signing required on client/server. Null sessions blocked.
+
+Remote Access and RDP Core (counted items)
+- In System Properties → Remote, I unchecked “Allow remote connections” (fDenyTSConnections=1) and disabled Remote Assistance.
+- In services.msc, I set Remote Desktop Services (TermService) to Disabled.
+- In regedit (HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp and Policies key), I set NLA on (UserAuthentication=1), SecurityLayer=2 (TLS), MinEncryptionLevel=3 (High).
+- In Local Security Policy → User Rights Assignment, I set “Allow log on through Remote Desktop Services” to Administrators only, and denied Guests/local accounts.
+
+RDP Extras (defense-in-depth)
+- In gpedit.msc (or registry under HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services), I set: Prompt for password on connection = Enabled; Set time limit for active sessions = 30 minutes; Set time limit for disconnected sessions/logoff on disconnect = Enabled.
+- Still there, I disabled redirection: COM/LPT, printers, drives, clipboard, PnP. I set Shadow = Do not allow, fClientDisableUDP = 1 (TCP only), AllowEncryptionOracle = 0 (CredSSP harden), and allowed Restricted Admin (DisableRestrictedAdmin=0). In Windows Firewall (wf.msc), I blocked inbound TCP 3389 on Public/Private.
+
+Sharing, Discovery, and Services
+- In Computer Management → Shared Folders → Shares, I deleted any non-default shares (kept ADMIN$, C$, IPC$). Services: stopped/disabled FDResPub, SSDPSRV, upnphost, RemoteRegistry, WinRM, Telnet client feature, Remote Access, TlntSvr, SNMP, ssh/sshd, TeamViewer/AnyDesk/VNC if present. I left EventLog, LanmanWorkstation, LanmanServer, w32time, and DHCP running.
+
+Firewall and Defender
+- In wf.msc I reset the firewall, enabled Domain/Public/Private profiles, set default inbound to Block, and removed any allow-all inbound rules.
+- In Windows Security I ensured Real-time, IOAV, Script, and Behavior monitoring were on. In PowerShell: Set-MpPreference -PUAProtection Enabled; -MAPSReporting Advanced; -SubmitSamplesConsent Always; cleared exclusions; Update-MpSignature; Start-MpScan -ScanType QuickScan.
+
+App Security (Browsers and Office)
+- Chrome/Edge/Firefox: via regedit (Policies paths) I disabled password manager, autofill, sign-in/sync, set SafeBrowsing/SmartScreen on, and set home/new-tab to about:blank. Updates left enabled.
+- Office (if installed): in Trust Center I set Macros = Disable all, and in Protected View I enabled all checks (internet/attachments/unsafe locations).
+
+Updates
+- In gpedit.msc or registry (HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU), I set NoAutoUpdate=0 and AUOptions=4 (auto download/install). Services wuauserv and BITS set to Automatic and started.
+
+Logging and Auditing
+- In gpedit.msc for PowerShell logging (or registry under HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell), I enabled ScriptBlock, Module logging, and Transcription, pointing to C:\PSLogs (created the folder).
+- In an elevated prompt: auditpol /set /category:* /success:enable /failure:enable.
+
+Network Hygiene
+- In Internet Options (inetcpl.cpl) I set no proxy/auto config; disabled “Automatically detect.” In regedit HKLM\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient, EnableMulticast=0 (LLMNR off). NetBIOS: in adapter properties → IPv4 → Advanced → WINS → Disable NetBIOS. DNS: set to DHCP and ran ipconfig /flushdns. Disabled IPv6 tunnels via DisabledComponents=255 in HKLM\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters.
+
+Persistence Cleanup
+- In regedit, I cleared IFEO Debugger entries (HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options) and AppInit_DLLs (HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows). I reset Winlogon Shell to explorer.exe and Userinit to userinit.exe,. I emptied Run/RunOnce keys (HKCU/HKLM and WOW6432). I cleaned Startup folders (ProgramData and user).
+- In PowerShell, I removed pending BITS jobs (Get-BitsTransfer -AllUsers | Remove-BitsTransfer).
+
+Scheduled Tasks
+- In Task Scheduler I disabled non-Microsoft tasks or any with sketchy actions (powershell, wscript, mshta, cmd, “joke/rat/miner” patterns). Also disabled Remote Assistance tasks.
+
+Malware/PUP Sweep
+- I manually searched common folders (Program Files, Program Files (x86), ProgramData, Users, Temp) and deleted hacking/remote-control tools: teamviewer, anydesk, vnc, netcat/nc, ngrok, wireshark, nmap, metasploit, mimikatz, sqlmap, aircrack, hydra, putty, winscp, miners, RAT/joke files, torrents/media clutter.
+
+System Hygiene
+- Hosts file reset to just localhost entries. Time sync: w32tm /resync and set NTP server time.windows.com. I removed expired root certs in certlm.msc (Trusted Root) by sorting on expiration.
+- I ran wuauclt /detectnow and wuauclt /reportnow to poke updates.
+
+TLS/SChannel Hardening
+- In regedit under SCHANNEL Protocols I disabled SSL 2.0/3.0 and TLS 1.0/1.1 (Enabled=0 for Server/Client). Under SCHANNEL\Ciphers I disabled DES/RC2/RC4/3DES by setting Enabled=0. Under KeyExchangeAlgorithms\Diffie-Hellman I set ServerMinKeyBitLength=2048.
+
+Screen Lock
+- In Settings → Personalization → Lock screen → Screen saver settings (or regedit HKCU\Control Panel\Desktop) I enabled a screensaver, set timeout 600 seconds, required password on resume, and set ScreenSaverGracePeriod to 0 in HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon.
+
+Cleanup
+- I emptied C:\Windows\Temp, C:\Temp, and user Downloads; cleared Prefetch; deleted TEMP user profiles via System Properties → User Profiles (or WMI). Flushed DNS cache.
+
+Image Security Walkthrough (86/100)
+Tone: First-person, “I did this, then that,” light humor; every action is manual (no script hints), simple enough for a high schooler.
+
+Prep (what I opened)
+- Logged in as local admin; confirmed C:\aeacus\phocus.exe exists.
+- Opened: secpol.msc (Local Security Policy), gpedit.msc (if available), services.msc, wf.msc (Windows Firewall), taskschd.msc (Task Scheduler), regedit, certlm.msc, eventvwr.msc when needed, inetcpl.cpl, appwiz.cpl, computer management (lusrmgr.msc), and an elevated PowerShell/Command Prompt for commands.
+
+Forensics (3 questions)
+- I opened the forensics questions file on the desktop first so I would not forget. I read each prompt, searched system clues (Event Viewer, file timestamps, unusual folders, browser history, and program traces), and wrote the answers in that file before changing anything.
+- Typical approach I used: Security log for logon events, System log for service starts, Task Scheduler history for odd tasks, Downloads/Temp for planted files, and browser history for the “visited site” style questions. I saved the three answers back into the desktop question file and noted them for the scorer.
+
+Accounts and Password Hygiene
+- In lusrmgr.msc: disabled Guest, DefaultAccount, WDAGUtilityAccount; disabled any unknown locals. Kept only Santa/Elf1-4/Administrator as admins; Buddy/Kevin/Frosty as standard. Removed everyone else from Administrators, Remote Desktop Users, and Remote Management Users.
+- In each user’s properties: unchecked “Password never expires.”
+- In secpol.msc → Account Policies → Password Policy: min length 12, max age 60 days, min age 1 day, history 5. Account Lockout Policy: threshold 3, duration 30 minutes, reset 30 minutes.
+
+Local Security Options
+- secpol.msc → Security Options: enabled Ctrl+Alt+Del requirement, hid last user name, set machine inactivity to 600 seconds (10 minutes), set legal banner caption/text.
+- Still there: limited blank passwords to console only, set LAN Manager auth level to NTLMv2 only, do not store LM hashes, blocked anonymous SAM/share enumeration, set RestrictAnonymous values, turned off “Everyone includes Anonymous,” required SMB signing (client and server), blocked null sessions.
+
+Remote Access and Core RDP (counted items)
+- System Properties → Remote: unchecked “Allow remote connections” (RDP off) and unchecked Remote Assistance.
+- services.msc: set Remote Desktop Services (TermService) to Disabled.
+- regedit (HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp and Policies key): set UserAuthentication=1 (NLA), SecurityLayer=2 (TLS), MinEncryptionLevel=3 (High).
+- secpol.msc → User Rights Assignment: “Allow log on through Remote Desktop Services” = Administrators only; denied Guests/local accounts for RDP.
+
+RDP Extras (defense-in-depth)
+- gpedit.msc or regedit (HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services): enabled prompt for password, set logoff on disconnect, set max active/disconnect time to 30 minutes, and enforced password prompts.
+- Disabled redirection for COM, LPT, printers, drives, clipboard, and PnP. Disabled shadowing. Forced TCP only (disabled UDP). Hardened CredSSP (AllowEncryptionOracle=0). Allowed Restricted Admin mode (DisableRestrictedAdmin=0). In wf.msc, blocked inbound TCP 3389 on Public/Private profiles.
+
+Sharing, Discovery, and Services
+- Computer Management → Shared Folders: removed any share that was not ADMIN$, C$, or IPC$.
+- services.msc: stopped/disabled FDResPub, SSDPSRV, upnphost (network discovery). Turned off RemoteRegistry, WinRM; disabled Telnet client feature (optional features). Disabled risky services: RemoteAccess, TlntSvr, TermService, SNMP, ssh/sshd, TeamViewer/AnyDesk/VNC variants, Xbox services, DiagTrack, dmwappush, iphlpsvc. Kept EventLog, LanmanWorkstation, LanmanServer, w32time, DHCP running.
+
+Firewall and Defender
+- wf.msc: reset firewall; enabled Domain/Public/Private; default inbound = Block; removed any allow-all inbound rules.
+- Windows Security: ensured Real-time, IOAV, Script, and Behavior monitoring on. In PowerShell: Set PUA on, MAPS to Advanced, sample submission Always, cleared exclusions, updated signatures, and ran a quick scan.
+
+App Security (Browsers and Office)
+- Chrome/Edge/Firefox policies (via regedit under Policies paths): disabled password manager, autofill, sign-in/sync; enabled SafeBrowsing/SmartScreen; set home/new tab to about:blank; left updates enabled.
+- Office (if installed): Trust Center → Macros disabled; Protected View enabled for internet, attachments, and unsafe locations.
+
+Updates
+- gpedit.msc or regedit (HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU): NoAutoUpdate=0, AUOptions=4. Services wuauserv and BITS set to Automatic and started.
+
+Logging and Auditing
+- PowerShell logging: enabled ScriptBlock, Module logging, and Transcription to C:\PSLogs (created that folder) via gpedit/registry under HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell.
+- Audit policy: in admin prompt, auditpol /set /category:* /success:enable /failure:enable.
+
+Network Hygiene
+- Internet Options (inetcpl.cpl): proxy off, autodetect off. Registry: HKLM\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient EnableMulticast=0 (LLMNR off). Adapter properties → IPv4 → Advanced → WINS: disable NetBIOS. DNS set to DHCP; ran ipconfig /flushdns. Disabled IPv6 tunnels by setting DisabledComponents=255 in HKLM\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters.
+
+Persistence Cleanup
+- regedit: cleared IFEO Debugger entries (HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options) and AppInit_DLLs (HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows). Reset Winlogon Shell to explorer.exe and Userinit to userinit.exe,. Cleared Run and RunOnce in HKCU/HKLM and WOW6432. Emptied Startup folders in ProgramData and the user profile. Removed pending BITS jobs (Get-BitsTransfer -AllUsers | Remove-BitsTransfer).
+
+Scheduled Tasks
+- taskschd.msc: disabled non-Microsoft tasks or any with suspicious actions (powershell, wscript, mshta, cmd, “joke/rat/miner” strings). Disabled Remote Assistance tasks.
+
+Malware/PUP Sweep
+- Manually searched Program Files, Program Files (x86), ProgramData, Users, C:\Temp, C:\Windows\Temp for hacking/remote-control tools: teamviewer, anydesk, vnc, uvnc, netcat/nc/nc64, ngrok, wireshark, nmap, metasploit, mimikatz, sqlmap, aircrack, hydra, putty, winscp, miners, RAT or “joke” binaries, torrents/media archives. Deleted those plus unwanted media (.mp3/.mp4/.avi/.mkv/.mov/.iso/.img/.vhd/.zip/.rar/.torrent) as required.
+
+System Hygiene
+- Edited hosts file to only localhost entries. Ran w32tm /resync and set NTP server to time.windows.com,0x9 (also set in registry and w32tm /config). Removed expired root certs in certlm.msc (Trusted Root Certification Authorities) by sorting on NotAfter and deleting expired ones.
+- Ran wuauclt /detectnow and /reportnow to nudge update detection/reporting.
+
+Encryption and TLS
+- BitLocker: checked C: in manage-bde or PowerShell; if protection was paused, I resumed it. If BitLocker tools missing, I noted it.
+- regedit SCHANNEL protocols: disabled SSL 2.0, SSL 3.0, TLS 1.0, TLS 1.1 (Enabled=0 under Server/Client). SCHANNEL\Ciphers: disabled DES, RC2, RC4, 3DES (Enabled=0). SCHANNEL\KeyExchangeAlgorithms\Diffie-Hellman: ServerMinKeyBitLength=2048.
+
+Screen Lock and UX
+- Screen saver: enabled, timeout 600 seconds, require password on resume (Settings → Personalization → Lock screen → Screen saver) and ScreenSaverGracePeriod=0 in HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon.
+- Disabled Cortana, Start menu suggestions, Advertising ID, consumer features, timeline/activity history, clipboard history, GameDVR, and set camera/mic default access to Deny (Privacy settings or CapabilityAccessManager registry values).
+
+Cleanup and Privacy
+- Deleted contents of C:\Windows\Temp, C:\Temp, user Downloads; cleared Prefetch; deleted temp user profiles via System Properties → User Profiles (or WMI); flushed DNS cache.
+- Blocked removable storage (RemovableStorageDevices Deny_All=1). Disabled AutoPlay/Autorun in gpedit (and matching registry in HKLM/HKCU Explorer). Set Delivery Optimization to HTTP only (DODownloadMode=0). Kept Security Center notifications on. Set telemetry to Minimum (AllowTelemetry=0). Set UAC notifications on.
+
+RDP History and Remote Assistance
+- regedit: deleted HKCU\Software\Microsoft\Terminal Server Client\Servers and Default to clear RDP history. Remote Assistance stayed off in System Properties and policies; related scheduled tasks disabled.
+
+SMB and Network Protections
+- Disabled SMB1 optional feature. Blocked insecure guest auth (AllowInsecureGuestAuth=0). Enforced SMB signing (client/server). Disabled hidden share registry leftovers (LanmanServer\Shares admin$ entry cleaned when necessary). Set IPv4 source routing disabled and ICMP redirects off (Tcpip\Parameters). Disabled Teredo/ISATAP/6to4 (DisabledComponents=255).
+
+Credential Hygiene and LSA
+- Set CachedLogonsCount to 0 in Winlogon. Enabled LSA protection (RunAsPPL=1). Disabled LM hashes/NTLMv1 again to be sure (NoLMHash=1, LmCompatibilityLevel=5). Disallowed password saving for RDP. Set KeepAlive for RDP and idle timeout. Disabled password saving in RDP client policies.
+
+AppLocker and SRP (audit-style)
+- Created AppLocker policy container (SrpV2) in registry (audit only). Created Software Restriction Policy: default level Disallowed, Authenticode on, Transparent enabled, scope all users; added path rule blocking %USERPROFILE%\*.ps1 to stop user-profile scripts.
+
+Features and Services Cleanup
+- Disabled Windows optional features: TFTP, SMB1Protocol, Printing-Foundation-Features. Disabled Print Spooler (stopped and set Disabled). Removed OneDrive via its uninstallers in System32/SysWOW64. Disabled GameDVR via policy/registry.
+
+Browser Home/Startup
+- Chrome/Edge policies: homepage about:blank, new tab about:blank, RestoreOnStartup=4 with URL about:blank.
+
+Delivery Optimization and Advertising
+- Set CloudContent policies to disable consumer experiences; AdvertisingInfo disabled; DeliveryOptimization DODownloadMode=0.
+
+Crash Dumps
+- Set kernel dump only: HKLM\SYSTEM\CurrentControlSet\Control\CrashControl CrashDumpEnabled=2 and AlwaysKeepMemoryDump=0.
+
+Finalization
+- Ran gpupdate /force to apply policies.
+- Launched C:\aeacus\phocus.exe to check: score landed at 86/100. If it had been lower, I would reboot once and re-verify RDP, firewall, Defender, accounts, and rerun the scorer.
+
+Humor Footnote
+- RDP is that friend who eats all your snacks. I locked the pantry, hid the snacks, wired motion sensors, and told the neighbor’s dog to bark at port 3389.

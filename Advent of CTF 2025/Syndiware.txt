@@ -1,0 +1,126 @@
+Syndiware - Forensics Challenge Writeup
+========================================
+
+Challenge Description:
+----------------------
+Analyze ransomware artifacts to recover something the Syndicate didn't intend 
+for anyone to find.
+
+Files Provided:
+---------------
+- syndicate_locker.zip containing:
+  - FreeRobux.py (ransomware source code)
+  - ransomware.DMP (Windows memory dump)
+  - encrypted_files/ (3 encrypted files)
+
+Solution:
+---------
+
+Step 1: Analyze the Ransomware Source Code
+------------------------------------------
+Key constants from FreeRobux.py:
+- k_size = 32 (XOR key size in bytes)
+- f_size = 60 (filename field size)
+- marker = b'\xAA\xBB\xCC\xDD' (4-byte marker)
+
+Memory entry structure (96 bytes total):
+- Filename: 60 bytes (null-padded)
+- XOR Key: 32 bytes
+- Marker: 4 bytes (0xAABBCCDD)
+
+The ransomware XORs files with random 32-byte keys and stores the 
+filename+key+marker in VirtualAlloc memory.
+
+Step 2: Extract Keys from Memory Dump
+--------------------------------------
+Search for marker bytes 0xAABBCCDD in the memory dump:
+
+    with open('ransomware.DMP', 'rb') as f:
+        data = f.read()
+    
+    marker = b'\xAA\xBB\xCC\xDD'
+    positions = []
+    pos = 0
+    while True:
+        pos = data.find(marker, pos)
+        if pos == -1:
+            break
+        positions.append(pos)
+        pos += 1
+
+Found 3 entries at offsets: 3094309, 3094405, 3094501
+
+For each entry, extract filename (60 bytes before key) and key (32 bytes before marker):
+
+    entry_start = marker_pos - 32 - 60  # 92 bytes before marker
+    filename = data[entry_start:entry_start+60].rstrip(b'\x00')
+    key = data[entry_start+60:entry_start+92]
+
+Recovered keys:
+- Elf 41's Diary.pdf: 7eb6ed7aa1e1c0a59163d1551124dac065dd16c90f926e3cae58d3a32fd6e5ca
+- Elf67's Diary.pdf:  3bcdad92edbe7ee092eac7872490f555c667a5d56d7bc4c1f52dc1dbe231c69c
+- ourking.png:        0d89c7900e8044b5e0ef1e905b5bea9daf31b5843f92ec7de7accd46e524cf08
+
+Step 3: Decrypt the Files
+-------------------------
+XOR decryption (key repeats cyclically):
+
+    def xor_decrypt(data, key):
+        return bytes([data[i] ^ key[i % len(key)] for i in range(len(data))])
+
+All three files decrypted successfully (PDF headers, PNG magic bytes verified).
+
+Step 4: Analyze Decrypted Files
+-------------------------------
+The PDFs contained strange content - only digit characters!
+
+Elf 41's Diary.pdf: Contains 8-digit groups of 1s and 4s
+Elf67's Diary.pdf:  Contains 8-digit groups of 6s and 7s
+
+This is binary encoding! Each 8-digit group = 1 byte.
+
+Step 5: Decode the Binary-Encoded PDFs
+--------------------------------------
+Elf 41's Diary (1/4 encoding):
+- Mapping: 4=1, 1=0
+- Result: Text from Fahrenheit 451 by Ray Bradbury
+  "It was a pleasure to burn..."
+
+Elf67's Diary (6/7 encoding):
+- Mapping: 7=1, 6=0
+- Result: Text from 1984 by George Orwell
+  "It was a bright cold day in April, and the clocks were striking thirteen..."
+
+    import fitz
+    import re
+    
+    doc = fitz.open("decrypted_Elf67_Diary.pdf")
+    all_text = "".join(page.get_text() for page in doc)
+    
+    groups = re.findall(r'[67]{8}', all_text)
+    
+    result = bytearray()
+    for g in groups:
+        bits = g.translate(str.maketrans('67', '01'))
+        result.append(int(bits, 2))
+    
+    decoded = bytes(result)
+    # Search for flag
+    if b'csd{' in decoded:
+        idx = decoded.find(b'csd{')
+        end = decoded.find(b'}', idx) + 1
+        print(decoded[idx:end])
+
+The flag was hidden within the decoded 1984 text!
+
+Flag:
+-----
+csd{73rr1bl3_R4ns0m3w3r3_4l50_67_15_d34d}
+
+Key Insights:
+-------------
+1. Always read source code first to understand data structures
+2. Memory dumps preserve encryption keys if stored in memory
+3. Steganography can hide data in plain sight (digits encoding binary)
+4. The naming convention (Elf 41 = 1/4, Elf67 = 6/7) was a hint!
+5. Flag translates to: "Terrible Ransomware Also 67 Is Dead"

@@ -1,0 +1,221 @@
+================================================================================
+                         JINGLE'S "UNBREAKABLE" CRYPTO
+                              or: Log Folly Indeed
+                    How to Break Discrete Log in 3 Seconds Flat
+================================================================================
+
+Challenge: Discrete Log? More Like Discrete LOL
+Flag: csd{n0t_s0_unbr34k4bl3_bc3e9f1c}
+
+================================================================================
+                              THE SETUP
+================================================================================
+
+Got a message from Jingle McSnark, who was apparently still salty about his 
+last challenge getting pwned:
+
+  "Since you somehow solved my last challenge I made something ACTUALLY 
+   secure this time. True discrete log strength. Unbreakable. And I even 
+   rotate the secret every round so you cannot rely on patterns. This is 
+   REAL cryptography human."
+
+Snowdrift walks by, sees the file, whispers: "He still keeps exponentiating 
+the wrong thing"
+
+*chef's kiss* Thanks Snowdrift. That's all I needed.
+
+================================================================================
+                           THE "SECURE" CODE
+================================================================================
+
+Let's see what Jingle cooked up:
+
+    from Crypto.Util.number import getPrime, bytes_to_long
+    from secret import FLAG
+
+    def rotate(s):
+        return s[1:] + s[:1]
+
+    p = getPrime(256)
+    g = 2
+
+    print('p: ', p)
+    for _ in range(len(FLAG)):
+        x = bytes_to_long(FLAG.encode())
+        h = pow(g, x, p)
+        print('leak: ', h)
+        FLAG = rotate(FLAG)
+
+So he:
+1. Picks a 256-bit prime p
+2. For each character in the flag, computes g^FLAG mod p
+3. Then rotates the flag left by 1 character
+4. Repeats
+
+And he thinks this is "unbreakable discrete log." 
+
+Oh honey, no.
+
+================================================================================
+                          THE FACEPALM MOMENT
+================================================================================
+
+The discrete logarithm problem IS hard... when the exponent is random and 
+you only get ONE leak.
+
+But Jingle gave us 32 LEAKS. One for each rotation of the flag.
+
+And here's the thing about rotating a string and converting to integer:
+
+If FLAG = "csd{...}" as bytes, then:
+  x = c[0]*256^31 + c[1]*256^30 + ... + c[31]*256^0
+
+After rotating left by 1: "sd{...}c"
+  x' = c[1]*256^31 + c[2]*256^30 + ... + c[0]*256^0
+
+The relationship between these two values:
+  x' = 256*x - c[0]*256^32 + c[0]
+  x' = 256*x + c[0]*(1 - 256^32)
+
+In other words, EACH CONSECUTIVE PAIR OF LEAKS is related by a simple 
+formula that depends on ONE CHARACTER of the flag!
+
+================================================================================
+                           THE MATH (BEAR WITH ME)
+================================================================================
+
+Given:
+  leak[i]   = g^x mod p
+  leak[i+1] = g^{x'} mod p
+
+And we know:
+  x' = 256*x + c_i * (1 - 256^n)
+
+Therefore:
+  leak[i+1] = g^{256*x + c_i*(1-256^n)} mod p
+            = (g^x)^256 * g^{c_i*(1-256^n)} mod p
+            = leak[i]^256 * (g^{1-256^n})^{c_i} mod p
+
+Rearranging:
+  (g^{1-256^n})^{c_i} = leak[i+1] / leak[i]^256 mod p
+
+The left side only depends on c_i (the i-th character).
+The right side we can compute from the leaks.
+
+So for each position, we just... try all printable ASCII characters (32-126)
+and see which one satisfies the equation.
+
+That's 95 tries per character. For a 32 character flag.
+
+Total work: 95 * 32 = 3040 modular exponentiations.
+
+My laptop did it in about 0.3 seconds.
+
+"Unbreakable" btw.
+
+================================================================================
+                            THE SOLVE
+================================================================================
+
+    p = 1058915527827682734854398114884433542355450236731953530538...
+    g = 2
+    leaks = [74834831693..., 94637262384..., ...]  # 32 values
+
+    n = 32  # flag length
+    
+    # Precompute the base for our brute force
+    factor = 1 - pow(256, n)
+    base_exp = pow(g, factor, p)  # g^{1 - 256^32} mod p
+
+    flag_chars = []
+    for i in range(n):
+        # Compute the target: leak[i+1] / leak[i]^256
+        next_leak = leaks[(i + 1) % n]
+        current_pow256 = pow(leaks[i], 256, p)
+        target = (next_leak * pow(current_pow256, -1, p)) % p
+        
+        # Brute force the character
+        for c in range(32, 127):
+            if pow(base_exp, c, p) == target:
+                flag_chars.append(chr(c))
+                break
+    
+    flag = ''.join(flag_chars)
+    print(flag)
+
+Output:
+    csd{n0t_s0_unbr34k4bl3_bc3e9f1c}
+
+================================================================================
+                         WHY JINGLE IS BAD AT CRYPTO
+================================================================================
+
+The discrete log problem is:
+  Given g, p, and h = g^x mod p, find x.
+
+This IS hard when:
+  - x is random and large
+  - You only get ONE (g, h) pair
+  - p is a safe prime with no special structure
+
+This is NOT hard when:
+  - You get MULTIPLE related samples
+  - The relationship between samples leaks information about the secret
+  - You're literally telling the attacker exactly how you're transforming x
+
+Jingle thought "I'll rotate the secret so there's no pattern!"
+Jingle did not realize rotating IS the pattern.
+
+The flag says it all: "n0t_s0_unbr34k4bl3"
+
+No Jingle. No it was not.
+
+================================================================================
+                           LESSONS LEARNED
+================================================================================
+
+1. Don't leak multiple related encryptions of the same secret
+2. If you must transform your secret, use something that doesn't create
+   algebraic relationships (like... hashing?)
+3. "Rotating the secret" is not a security measure, it's a vulnerability
+4. Maybe don't trash talk about your "unbreakable" crypto before testing it
+5. Listen to Snowdrift. Snowdrift knows things.
+
+================================================================================
+                              THE SOLVE SCRIPT
+================================================================================
+
+    from Crypto.Util.number import long_to_bytes
+
+    p = <big prime>
+    g = 2
+    leaks = [<32 values>]
+    n = len(leaks)
+
+    factor = 1 - pow(256, n)
+    base_exp = pow(g, factor, p)
+
+    flag = ''
+    for i in range(n):
+        target = (leaks[(i+1) % n] * pow(pow(leaks[i], 256, p), -1, p)) % p
+        for c in range(32, 127):
+            if pow(base_exp, c, p) == target:
+                flag += chr(c)
+                break
+
+    print(flag)  # csd{n0t_s0_unbr34k4bl3_bc3e9f1c}
+
+================================================================================
+                                 GG EZ
+================================================================================
+
+Time to solve: About 3 seconds (after understanding the math)
+Time Jingle spent being smug: Unknown, but too long
+Snowdrift MVP status: Confirmed
+
+The real discrete log was the friends we made along the way.
+Just kidding, it was basic algebra.
+
+Thanks Jingle! Your "real cryptography" was very educational! 📚🔐
+
+================================================================================

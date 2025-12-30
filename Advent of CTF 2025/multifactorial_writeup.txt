@@ -1,0 +1,114 @@
+Multifactorial CTF Write-up (csd.lol)
+
+Target scope: https://multifactorial.csd.lol/*
+Flag format: csd{...}
+
+Final flag
+---------
+csd{1_L34rn3D_7h15_Fr0m_70m_5C077_84CK_1n_2020}
+
+Overview
+--------
+The challenge simulates 3-factor auth:
+1) Something You Know (password)
+2) Something You Have (TOTP)
+3) Something You Are (WebAuthn/passkey)
+
+Each stage leaked just enough info to break the factor or glue the chain together.
+
+Stage 1: Something You Know (password)
+--------------------------------------
+- Page: /something-you-know
+- The obfuscated inline <script> contained a hash string embedded in a message. In my instance this was a 40-hex-character SHA-1: bf33632dd9668787878890cb4fbb54261b6b7571.
+- I identified the hash type by length and reversed it via quick local wordlist brute-force (and could also have used online lookup tools like hashes.com/crackstation). The plaintext is:
+
+  northpole123
+
+- API validation:
+  POST /api/something-you-know-check {"password":"northpole123"} -> success
+
+Notes:
+- If your page shows a 64-hex-character SHA-256 instead, treat similarly: recognize by length and reverse via dictionary or online lookup.
+
+Stage 2: Something You Have (TOTP)
+----------------------------------
+- Page: /something-you-have
+- The inline JS exposed a constant secret key used server-side for the verification HMAC:
+  ORACLE_KEY = "17_w0Uld_83_V3Ry_fUNnY_1f_y0U_7H0u9H7_7H15_W45_4_Fl49"
+- The verify endpoint supports a debug mode:
+  POST /api/something-you-have-verify?debug=1 {"code":"000000"}
+  Response includes: {"error":"Invalid TOTP code.", "hmac":"<hex>", "serverTime": ...}
+- The server computes HMAC as: HMAC-SHA256(secret_key, message), where message is just the six-digit TOTP string.
+- Attack: brute-force the 1,000,000 possibilities and find the code whose HMAC matches the leaked hmac.
+- I automated:
+  1) POST password to start a session
+  2) Fetch debug=1 to obtain the target HMAC
+  3) Iterate code = 000000..999999 and compute hmac(secret, code). When it equals target -> submit that code
+
+- Example result from one run:
+  Target HMAC: c55a1bdfa4b280abc38f6ac7507956ed2138cd209f46bfdbe52422f781fdc09f
+  FOUND TOTP: 593171
+  POST /api/something-you-have-verify {"code":"593171"} -> success
+
+Notes:
+- TOTP windows roll every 30 seconds; re-fetch hmac and re-bruteforce if it expires.
+
+Stage 3: Something You Are (WebAuthn)
+-------------------------------------
+- Pages: /register-passkey (registration) and /something-you-are (authentication)
+- Registration options endpoint:
+  POST /api/webauthn/register/options {"name":"<username>"}
+  Returns publicKey options including publicKey.user.id
+- Observation: publicKey.user.id is a truncated (first 16 bytes) SHA-256 of the provided username, base64url-encoded.
+  Examples:
+    name = "admin"  -> id starts with base64url(SHA256("admin")[:16])
+    name = "test1"  -> id starts with base64url(SHA256("test1")[:16])
+- Authentication page JS comment reveals the flaw:
+  The client sends a field named userHandle in the auth/verify payload. That field is not covered by the WebAuthn signature, but the server (incorrectly) trusts it to map the authenticated credential to an identity.
+
+Exploit chain:
+1) Pass Stages 1 and 2 to reach Stage 3.
+2) Register any passkey (I used a software-generated ES256 credential) under a benign name (e.g., "attacker"). This provides a valid credential the server will challenge and accept signatures from.
+3) Start authentication by calling POST /api/webauthn/auth/options to get the challenge.
+4) Create a valid assertion (authenticatorData + signature over authenticatorData || hash(clientDataJSON)) using our own key and credentialId.
+5) In the JSON we submit to POST /api/webauthn/auth/verify, replace the userHandle with santa’s handle:
+   - Compute santa’s handle per server convention: base64url( SHA256("santa")[:16] ) = ttyQg9o3L-0hGazhGum6hw
+6) The server verifies the signature (valid, since it’s our key) but trusts the spoofed userHandle to set the user context to santa.
+7) Navigate to /admin -> flag.
+
+Key values
+----------
+- Password: northpole123
+- TOTP HMAC secret (from JS): 17_w0Uld_83_V3Ry_fUNnY_1f_y0U_7H0u9H7_7H15_W45_4_Fl49
+- Santa userHandle (truncated SHA-256 of "santa"): ttyQg9o3L-0hGazhGum6hw
+- Final flag: csd{1_L34rn3D_7h15_Fr0m_70m_5C077_84CK_1n_2020}
+
+Endpoints touched
+-----------------
+- POST /api/something-you-know-check
+- POST /api/something-you-have-verify?debug=1
+- POST /api/something-you-have-verify
+- POST /api/webauthn/register/options
+- POST /api/webauthn/register/verify
+- POST /api/webauthn/auth/options
+- POST /api/webauthn/auth/verify
+- GET  /admin
+
+Reproduce (automation used)
+---------------------------
+I created helper scripts in this folder:
+- solve_stages.py — Automates Stage 1 and Stage 2 (password + TOTP brute force via leaked HMAC)
+- full_exploit.py — Full end-to-end exploit including WebAuthn spoofed userHandle to impersonate santa and fetch /admin.
+
+Quick run (requires Python 3 with requests, cryptography, cbor2 installed):
+
+  pip install requests cryptography cbor2
+  python3 full_exploit.py
+
+Expected outcome: it logs in as santa and prints the /admin page containing the flag above.
+
+Root causes & mitigations
+-------------------------
+- Stage 1: Never embed real password hashes client-side. Use server-side checks only; hash with a slow KDF (bcrypt/argon2id) and strong policy.
+- Stage 2: Never expose oracle/debug data that directly correlates with secrets. Verify TOTP using server-side shared secret and return only boolean. Limit attempts and add rate limits.
+- Stage 3: Do not trust client-provided userHandle. The relying party must map the assertion’s credentialId to the stored user record (where userHandle was originally bound) and ignore any userHandle sent by the client. Also avoid predictable/truncated user identifiers; store random 32-byte user handles.
