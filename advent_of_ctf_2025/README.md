@@ -35,27 +35,20 @@ Some challenges include supplemental notes or raw session logs; those appear as 
 
 *Source: writeups/Custom_packagingctf_writeup.txt*
 
-### ================================================================================
 
 ### CUSTOM PACKAGING CTF WRITEUP
 
 Forensics Challenge Solution
-================================================================================
-
 FLAG: csd{Kr4mPU5_RE4llY_l1ke5_T0_m4kE_EVeRytH1NG_CU5t0m_672Df}
 
-================================================================================
-CHALLENGE OVERVIEW
-================================================================================
+### CHALLENGE OVERVIEW
 
 We were given a custom encrypted container file (ks_operations.kcf) from the
 "KRAMPUS SYNDICATE" organization. The challenge provided hints about the
 encryption scheme used and required us to decrypt and extract files to find
 the flag.
 
-================================================================================
-FILE ANALYSIS
-================================================================================
+### FILE ANALYSIS
 
 The KCF file structure:
 
@@ -73,9 +66,7 @@ Header fields parsed:
 - Data offset: 0x4000 (16384 bytes)
 - Data size: 5,410,608 bytes
 
-================================================================================
-KEY DERIVATION (FOLLOWING THE HINTS)
-================================================================================
+### KEY DERIVATION (FOLLOWING THE HINTS)
 
 HINT 1 - Master Key Derivation:
 -------------------------------
@@ -113,9 +104,7 @@ Components:
 - file_offset: 8 bytes little-endian (offset within data region)
 - Truncated to 16 bytes for RC4 key
 
-================================================================================
-FAT STRUCTURE
-================================================================================
+### FAT STRUCTURE
 
 Each FAT entry is 96 bytes with the following structure:
 
@@ -126,9 +115,7 @@ Each FAT entry is 96 bytes with the following structure:
 - Bytes 16-19: File size (repeated)
 - Bytes 20+: Additional metadata
 
-================================================================================
-DECRYPTION PROCESS
-================================================================================
+### DECRYPTION PROCESS
 
 1. Parse the KCF header to extract nonce, timestamp, and file count
 2. Compute the master key using SHA256 with the identifier "ks2025"
@@ -140,9 +127,7 @@ DECRYPTION PROCESS
     d. Decrypt using RC4 with the per-file key
     e. Save the decrypted file
 
-================================================================================
-EXTRACTED FILES
-================================================================================
+### EXTRACTED FILES
 
 File type distribution:
 
@@ -154,9 +139,7 @@ File type distribution:
 
 Total: 168 files
 
-================================================================================
-FLAG LOCATION
-================================================================================
+### FLAG LOCATION
 
 
 The flag was found in FILE 137 (a text file):
@@ -166,9 +149,7 @@ csd{Kr4mPU5_RE4llY_l1ke5_T0_m4kE_EVeRytH1NG_CU5t0m_672Df}
 Translation: "Krampus really likes to make everything custom"
 (Fitting for a custom container format challenge!)
 
-================================================================================
-SOLUTION CODE
-================================================================================
+### SOLUTION CODE
 
 ```python
 import struct
@@ -229,9 +210,7 @@ if match:
 print(f"FLAG: {match.group().decode()}")
 ```
 
-================================================================================
-KEY TAKEAWAYS
-================================================================================
+### KEY TAKEAWAYS
 
 1. READ THE HINTS CAREFULLY - The hints provided the exact key derivation
     formulas. Following them precisely was the solution.
@@ -242,9 +221,7 @@ KEY TAKEAWAYS
 4. UNDERSTAND THE CRYPTO - RC4 + SHA256 is a simple but effective scheme.
     The per-file key derivation prevents known-plaintext attacks across files.
 
-================================================================================
-END OF WRITEUP
-================================================================================
+### END OF WRITEUP
 
 
 ## 2. Drone Control (Reverse / Network)
@@ -615,21 +592,17 @@ admin -> enter decimal -> print metadata
 
 *Source: writeups/FailedExfil.txt*
 
-### ================================================================================
 
 ### KRAMPUS SYNDICATE’S FAILED EXFIL SERVICE
 
 or: How I Learned to Stop Worrying
 and Love Format Strings
-================================================================================
 
 Challenge: Day 7 - The Collector
 Target: nc ctf.csd.lol 7777
 Flag: csd{Kr4mpUS_n33Ds_70_l34RN_70_Ch3Ck_c0Mp1l3R_W4RN1N92}
 
-================================================================================
-THE SETUP
-================================================================================
+### THE SETUP
 
 So apparently KRAMPUS Syndicate (very festive, very evil) set up a data
 exfiltration endpoint. Some guy named "vipin" shared a binary on his sketchy
@@ -642,9 +615,7 @@ TorTannenbaum: "just decomp it bru it aint that deep"
 
 Narrator: It was, in fact, that deep. At least without the binary.
 
-================================================================================
-STEP 1: WHAT IS THIS THING?
-================================================================================
+### STEP 1: WHAT IS THIS THING?
 
 Connected to the server. Got hit with a proof-of-work challenge first because
 apparently hackers need to prove they’re serious before hacking. Fair enough.
@@ -665,9 +636,7 @@ flag -> Says "auth: denied" without even asking. Rude.
 ```
 Everything else just returns "?" like I’m the idiot here.
 
-================================================================================
-STEP 2: TRYING LITERALLY EVERYTHING
-================================================================================
+### STEP 2: TRYING LITERALLY EVERYTHING
 
 Okay so I need to authenticate. Let me just try some passwords:
 
@@ -693,9 +662,7 @@ Let me try some big brain moves:
 
 Wait... format strings...
 
-================================================================================
-STEP 3: THE "OH SNAP" MOMENT
-================================================================================
+### STEP 3: THE "OH SNAP" MOMENT
 
 What if I try format strings in the WRITE command instead?
 
@@ -717,9 +684,7 @@ specifier and leaks memory addresses!
 This is like leaving your diary open on the kitchen table and being surprised
 when your roommate reads it. Classic developer move.
 
-================================================================================
-STEP 4: DUMPING THE STACK
-================================================================================
+### STEP 4: DUMPING THE STACK
 
 Time to leak EVERYTHING. Used %N$p to read specific stack positions:
 
@@ -734,9 +699,7 @@ Time to leak EVERYTHING. Used %N$p to read specific stack positions:
 Most values look like memory addresses (start with 0x7f for libc, etc.)
 But positions 13 and 21 look like... random data? Suspicious.
 
-================================================================================
-STEP 5: THE HINT THAT SAVED ME
-================================================================================
+### STEP 5: THE HINT THAT SAVED ME
 
 Got a hint: "The secret code sits inside those eight bytes, just not in the
 position you might expect. Try isolating the upper four bytes..."
@@ -753,9 +716,7 @@ Lower 4 bytes: 0xbd98ab78 = 3180899192 in decimal
 
 The PASSWORD is the upper 4 bytes converted to decimal!
 
-================================================================================
-STEP 6: VICTORY LAP
-================================================================================
+### STEP 6: VICTORY LAP
 
 ```
 cmd: write
@@ -778,9 +739,7 @@ checksum: 4be2f1aa
 ```
 GET REKT KRAMPUS
 
-================================================================================
-WHY THIS WORKED
-================================================================================
+### WHY THIS WORKED
 
 1. The server stores a random auth token on the stack
 2. The write function uses printf() without format validation (bad bad bad)
@@ -795,9 +754,7 @@ Translation: "KRAMPUS NEEDS TO LEARN TO CHECK COMPILER WARNINGS"
 When you compile C code with printf(user_input) instead of printf("%s", user_input),
 the compiler SCREAMS at you with warnings. KRAMPUS ignored them. Don’t be KRAMPUS.
 
-================================================================================
-LESSONS LEARNED
-================================================================================
+### LESSONS LEARNED
 
 1. Always check compiler warnings (especially -Wformat-security)
 2. Format string vulnerabilities are still alive and well in 2025
@@ -807,9 +764,7 @@ LESSONS LEARNED
 
 5. The guy who said "just decomp it bru" was lowkey right, the vuln was simple
 
-================================================================================
-FINAL SOLVE SCRIPT
-================================================================================
+### FINAL SOLVE SCRIPT
 
 ```
 import socket
@@ -836,9 +791,7 @@ sock.recv(4096)
 sock.send(f’{password}\n’.encode())
 print(sock.recv(4096)) # FLAG!
 ```
-================================================================================
-GG EZ
-================================================================================
+### GG EZ
 
 Time spent: Way too long before realizing format strings existed
 Coffee consumed: Yes
@@ -846,7 +799,6 @@ Sanity remaining: Questionable
 
 Thanks for the challenge! Merry KRAMPUS!
 
-================================================================================
 
 
 ## 6. Frostbyte CTF Challenge Writeup
@@ -854,7 +806,6 @@ Thanks for the challenge! Merry KRAMPUS!
 *Source: writeups/frostbyte_writeup.txt*
 
 Frostbyte CTF Challenge Writeup
-================================
 
 Challenge: frostbyte
 Server: nc ctf.csd.lol 8888
@@ -1374,21 +1325,17 @@ Humor Footnote
 
 *Source: writeups/Jingle's Validator.txt*
 
-### ================================================================================
 
 ### JINGLE’S VALIDATOR
 
 or: "Military-Grade" Meets Mathematics
 A Tale of Hubris and Custom VMs
-================================================================================
 
 Challenge: NPLD Tool Suite License Validator (jollyvm)
 Category: Reverse Engineering
 Flag: csd{I5_4ny7HiN9_R34LlY_R4Nd0m_1F_it5_bru73F0rc4B1e?}
 
-================================================================================
-THE EMAIL THREAD
-================================================================================
+### THE EMAIL THREAD
 
 From: Jingle McSnark <jingle@northpole.internal>
 To: licensing-dept@northpole.internal
@@ -1418,9 +1365,7 @@ Let me know when you want a second opinion.
 
 [Jingle has not responded]
 
-================================================================================
-INITIAL RECONNAISSANCE
-================================================================================
+### INITIAL RECONNAISSANCE
 
 ```
 $ file jollyvm
@@ -1436,11 +1381,7 @@ A stripped 64-bit binary. License key validation. Jingle thinks it’s uncrackab
 
 Challenge accepted.
 
-================================================================================
-THE FIRST CLUE: LENGTH CHECK
-
-
-### ================================================================================
+### THE FIRST CLUE: LENGTH CHECK
 
 Looking at the disassembly:
 
@@ -1456,9 +1397,7 @@ Let me guess: csd{...} with 48 characters inside the braces.
 c s d { [48 characters of "randomness"] }
 1 + 1 + 1 + 1 + 48 + 1 = 52 OK
 ```
-================================================================================
-THE HORROR: A CUSTOM VM
-================================================================================
+### THE HORROR: A CUSTOM VM
 
 Deeper in the binary, I found something terrifying:
 
@@ -1480,9 +1419,7 @@ The VM has:
 - Bytecode stored at offset 0x2120
 - A "key" array stored at offset 0x20e0
 
-================================================================================
-REVERSING THE VM OPCODES
-================================================================================
+### REVERSING THE VM OPCODES
 
 After staring at the jump table handlers, I mapped out the instruction set:
 
@@ -1520,9 +1457,7 @@ Each instruction is 6 bytes: opcode(1) + arg1(1) + arg2(1) + pad(1) + imm16(2)
 
 Jingle... you built a whole CPU architecture for a license check?!
 
-================================================================================
-DISASSEMBLING THE BYTECODE
-================================================================================
+### DISASSEMBLING THE BYTECODE
 
 After writing a disassembler, the algorithm became clear:
 
@@ -1564,9 +1499,7 @@ After writing a disassembler, the algorithm became clear:
 148: CMP_REG flag = r5 == r6 ; output must match stored key
 149: JF if !flag: FAIL
 ```
-================================================================================
-THE CRYPTOGRAPHIC INSIGHT
-================================================================================
+### THE CRYPTOGRAPHIC INSIGHT
 
 Jingle implemented a LINEAR FEEDBACK SHIFT REGISTER (LFSR) stream cipher!
 
@@ -1587,9 +1520,7 @@ If we know:
 
 Then we can DERIVE the keystream and work backwards!
 
-================================================================================
-THE MATHEMATICAL ATTACK
-================================================================================
+### THE MATHEMATICAL ATTACK
 
 Expected output (52 bytes at 0x20e0):
 3c 6f 53 88 d5 f6 00 28 b5 bc ab 8b 4d a6 e2 9a
@@ -1621,9 +1552,7 @@ Found: init_state = 0x00f3371c
 
 This means input[48:52] = [0x1c, 0x37, 0xf3, 0x00]
 
-================================================================================
-RECOVERING THE FULL KEY
-================================================================================
+### RECOVERING THE FULL KEY
 
 With the initial state known, run the LFSR forward and XOR each expected
 output byte with the keystream to recover the plaintext:
@@ -1652,9 +1581,7 @@ return bytes(recovered)
 Result:
 csd{I5_4ny7HiN9_R34LlY_R4Nd0m_1F_it5_bru73F0rc4B1e?}
 
-================================================================================
-VERIFICATION
-================================================================================
+### VERIFICATION
 
 ```
 $ echo ’csd{I5_4ny7HiN9_R34LlY_R4Nd0m_1F_it5_bru73F0rc4B1e?}’ | ./jollyvm
@@ -1663,9 +1590,7 @@ Enter license key: [+] License valid.
 ```
 *chef’s kiss*
 
-================================================================================
-WHY JINGLE’S "MILITARY-GRADE" FAILED
-================================================================================
+### WHY JINGLE’S "MILITARY-GRADE" FAILED
 
 Let’s count the ways:
 
@@ -1684,9 +1609,7 @@ Let’s count the ways:
 5. STORING THE EXPECTED OUTPUT IN THE BINARY
     Literally handed us the answer key!
 
-================================================================================
-WHAT JINGLE SHOULD HAVE DONE
-================================================================================
+### WHAT JINGLE SHOULD HAVE DONE
 
 For an offline license validator:
 
@@ -1716,9 +1639,7 @@ the answer embedded in the binary.
 
 "Military-grade" indeed.
 
-================================================================================
-THE AFTERMATH
-================================================================================
+### THE AFTERMATH
 
 From: Security Team
 To: licensing-dept@northpole.internal
@@ -1760,9 +1681,7 @@ I will be away from email for an indefinite period.
 ```
 For urgent matters, please contact literally anyone else.
 ```
-================================================================================
-SOLVE SCRIPT
-================================================================================
+### SOLVE SCRIPT
 
 ```
 #!/usr/bin/env python3
@@ -1824,9 +1743,7 @@ state = ((state << 8) | pt_lfsr) & 0xffffffff
 ```
 print(bytes(result).decode())
 ```
-================================================================================
-FINAL STATS
-================================================================================
+### FINAL STATS
 
 ```
 Lines of VM bytecode: 155 instructions
@@ -1835,9 +1752,7 @@ Time to understand cipher: 15 minutes
 Time to crack: 5 minutes
 Look on Jingle’s face: Priceless
 ```
-================================================================================
-LESSONS LEARNED
-================================================================================
+### LESSONS LEARNED
 
 1. Custom VMs add complexity, not security
 2. XOR stream ciphers need proper key derivation
@@ -1852,9 +1767,7 @@ Flag: csd{I5_4ny7HiN9_R34LlY_R4Nd0m_1F_it5_bru73F0rc4B1e?}
 
 Snowdrift sends their regards.
 
-================================================================================
-GG WP
-================================================================================
+### GG WP
 
 
 ## 10. Kramazon - Santa Priority (Auth Cookie Bypass)
@@ -2023,19 +1936,15 @@ Flag
 
 *Source: writeups/KDNU-3B.txt*
 
-### ================================================================================
 
 ### KDNU-3B FIRMWARE HACK WRITEUP
 
 "How I Made Santa’s Evil Drone Spill Its Secrets"
-================================================================================
 
 Challenge: KRAMPUS Syndicate KDNU-3B Navigation Firmware Analysis
 Flag: csd{3Asy_F1rmWAr3_HACk1N9_Fr}
 
-================================================================================
-THE STORY
-================================================================================
+### THE STORY
 
 So there I was, staring at a mysterious binary called "a.out" that the NPLD
 analysts recovered from some shady KRAMPUS Syndicate operation. Apparently
@@ -2044,9 +1953,7 @@ that rejects unexpected inputs. Sounds secure, right?
 
 *laughs in reverse engineer*
 
-================================================================================
-STEP 1: RECONNAISSANCE
-================================================================================
+### STEP 1: RECONNAISSANCE
 
 First things first - let’s see what we’re dealing with:
 
@@ -2065,9 +1972,7 @@ $ nm a.out | grep -E "main|nav"
 Interesting... "nav_core" at 0x401955. That sounds like where the juicy
 stuff might be hiding.
 
-================================================================================
-STEP 2: DISASSEMBLY TIME
-================================================================================
+### STEP 2: DISASSEMBLY TIME
 
 Let’s crack open main() and see what’s cooking:
 
@@ -2088,10 +1993,7 @@ and when you say "I’d like to speak to the manager" they just let you
 waltz into the back office.
 
 
-### ================================================================================
-
-STEP 3: ANALYZING nav_core()
-================================================================================
+### STEP 3: ANALYZING nav_core()
 
 Now let’s look at our target function:
 
@@ -2112,9 +2014,7 @@ The actual "open the secret file" code starts at 0x401989.
 
 What if I just... skip the check?
 
-================================================================================
-STEP 4: THE BIG BRAIN PLAY
-================================================================================
+### STEP 4: THE BIG BRAIN PLAY
 
 Instead of calling nav_core at 0x401955 and hoping the argument check
 magically passes, I’ll jump DIRECTLY to 0x401989!
@@ -2133,9 +2033,7 @@ calibration_profile=csd{3Asy_F1rmWAr3_HACk1N9_Fr}
 ```
 BOOM!
 
-================================================================================
-THE EXPLOIT SCRIPT
-================================================================================
+### THE EXPLOIT SCRIPT
 
 Because the server has a proof-of-work requirement (annoying but fair),
 I wrote a quick Python script:
@@ -2161,18 +2059,14 @@ sock.send(b’401989\n’)
 # Profit!
 print(sock.recv()) # FLAG BABY!
 ```
-================================================================================
-LESSONS LEARNED
-================================================================================
+### LESSONS LEARNED
 
 1. "Hardened" firmware means nothing if you let users call arbitrary addresses
 2. Always check what happens if you jump past security checks
 3. Function prologues are for chumps - real hackers jump to the middle
 4. The KRAMPUS Syndicate really needs to hire better security engineers
 
-================================================================================
-THE END
-================================================================================
+### THE END
 
 Flag: csd{3Asy_F1rmWAr3_HACk1N9_Fr}
 
@@ -2189,20 +2083,16 @@ Written with love and caffeine
 
 *Source: writeups/LogFolly.txt*
 
-### ================================================================================
 
 ### JINGLE’S "UNBREAKABLE" CRYPTO
 
 or: Log Folly Indeed
 How to Break Discrete Log in 3 Seconds Flat
-================================================================================
 
 Challenge: Discrete Log? More Like Discrete LOL
 Flag: csd{n0t_s0_unbr34k4bl3_bc3e9f1c}
 
-================================================================================
-THE SETUP
-================================================================================
+### THE SETUP
 
 Got a message from Jingle McSnark, who was apparently still salty about his
 last challenge getting pwned:
@@ -2218,9 +2108,7 @@ the wrong thing"
 
 *chef’s kiss* Thanks Snowdrift. That’s all I needed.
 
-================================================================================
-THE "SECURE" CODE
-================================================================================
+### THE "SECURE" CODE
 
 Let’s see what Jingle cooked up:
 
@@ -2256,11 +2144,7 @@ And he thinks this is "unbreakable discrete log."
 Oh honey, no.
 
 
-### ================================================================================
-
 ### THE FACEPALM MOMENT
-
-### ================================================================================
 
 The discrete logarithm problem IS hard... when the exponent is random and
 you only get ONE leak.
@@ -2282,9 +2166,7 @@ x’ = 256*x + c[0]*(1 - 256ˆ32)
 In other words, EACH CONSECUTIVE PAIR OF LEAKS is related by a simple
 formula that depends on ONE CHARACTER of the flag!
 
-================================================================================
-THE MATH (BEAR WITH ME)
-================================================================================
+### THE MATH (BEAR WITH ME)
 
 Given:
 leak[i] = gˆx mod p
@@ -2315,11 +2197,7 @@ My laptop did it in about 0.3 seconds.
 
 "Unbreakable" btw.
 
-================================================================================
-THE SOLVE
-
-
-### ================================================================================
+### THE SOLVE
 
 ```
 p = 1058915527827682734854398114884433542355450236731953530538...
@@ -2356,9 +2234,7 @@ print(flag)
 Output:
 csd{n0t_s0_unbr34k4bl3_bc3e9f1c}
 
-================================================================================
-WHY JINGLE IS BAD AT CRYPTO
-================================================================================
+### WHY JINGLE IS BAD AT CRYPTO
 
 The discrete log problem is:
 Given g, p, and h = gˆx mod p, find x.
@@ -2382,9 +2258,7 @@ The flag says it all: "n0t_s0_unbr34k4bl3"
 
 No Jingle. No it was not.
 
-================================================================================
-LESSONS LEARNED
-================================================================================
+### LESSONS LEARNED
 
 
 1. Don’t leak multiple related encryptions of the same secret
@@ -2394,9 +2268,7 @@ LESSONS LEARNED
 4. Maybe don’t trash talk about your "unbreakable" crypto before testing it
 5. Listen to Snowdrift. Snowdrift knows things.
 
-================================================================================
-THE SOLVE SCRIPT
-================================================================================
+### THE SOLVE SCRIPT
 
 ```
 from Crypto.Util.number import long_to_bytes
@@ -2423,9 +2295,7 @@ break
 ```
 print(flag) # csd{n0t_s0_unbr34k4bl3_bc3e9f1c}
 ```
-================================================================================
-GG EZ
-================================================================================
+### GG EZ
 
 Time to solve: About 3 seconds (after understanding the math)
 Time Jingle spent being smug: Unknown, but too long
@@ -2436,7 +2306,6 @@ Just kidding, it was basic algebra.
 
 Thanks Jingle! Your "real cryptography" was very educational!
 
-================================================================================
 
 
 ## 13. Multifactorial CTF Write-up (csd.lol)
@@ -2577,7 +2446,6 @@ Root causes & mitigations
 *Source: writeups/Re-Key-very.txt*
 
 Re-Key-very - Cryptography Challenge Writeup
-=============================================
 
 Challenge Description:
 ----------------------
@@ -2685,7 +2553,6 @@ Key Insights:
 *Source: writeups/Syndicate.txt*
 
 Krampus DNS Shenanigans - How I Got the Flag
-===========================================
 
 This challenge pretends to be "serious threat intel", but really it’s a
 breadcrumb hunt hidden entirely inside DNS records. No exploits, no scans,
@@ -2825,7 +2692,6 @@ End of suffering.
 *Source: writeups/Syndiware.txt*
 
 Syndiware - Forensics Challenge Writeup
-========================================
 
 Challenge Description:
 ----------------------
@@ -2975,21 +2841,17 @@ Key Insights:
 
 *Source: writeups/Time To Escalate.txt*
 
-### ================================================================================
 
 ### TIME TO ESCALATE
 
 or: How I Learned to Watch the Clock
 and Rescue Three Trapped Elves
-================================================================================
 
 Challenge: Elevator Shaft 3B - PIN Recovery via Timing Attack
 Target: nc ctf.csd.lol 5040
 Flag: csd{T1m1n9_T1M1N9_t1M1n9_1t5_4LL_480UT_tH3_t1m1n9}
 
-================================================================================
-THE DISTRESS CALL
-================================================================================
+### THE DISTRESS CALL
 
 *alarm bells ringing*
 
@@ -3020,9 +2882,7 @@ the response time when you get the first digit right?"
 ```
 *hacker senses tingling*
 
-================================================================================
-TIMING ATTACKS 101
-================================================================================
+### TIMING ATTACKS 101
 
 The validator is checking the PIN like this (pseudocode):
 
@@ -3050,9 +2910,7 @@ X ACCESS DENIED (Debug: 0.376s)
 ```
 KRAMPUS devs left debug output in production. Absolute legends.
 
-================================================================================
-THE HEIST BEGINS
-================================================================================
+### THE HEIST BEGINS
 
 Connected to the server:
 
@@ -3071,9 +2929,7 @@ Connected to the server:
 With timing attack: 10 x 6 = 60 attempts maximum.
 We’ve got room to spare. Let’s do this.
 
-================================================================================
-DIGIT BY DIGIT BREAKDOWN
-================================================================================
+### DIGIT BY DIGIT BREAKDOWN
 
 POSITION 1: Finding the first digit
 ------------------------------------
@@ -3164,12 +3020,7 @@ POSITION 6: Testing 40865x
 ---------------------------
 408650: JACKPOT!
 
-================================================================================
-
-
 ### THE MOMENT OF TRUTH
-
-### ================================================================================
 
 ```
 [Attempt 47/100] Enter 6-digit PIN: 408650
@@ -3193,9 +3044,7 @@ The flag translation: "Timing TIMING timing it’s ALL ABOUT THE timing"
 
 Yeah. Yeah it is.
 
-================================================================================
-THE SOLVE SCRIPT
-================================================================================
+### THE SOLVE SCRIPT
 
 ```
 from pwn import *
@@ -3250,9 +3099,7 @@ print(f"[+] PIN so far: {pin}")
 ```
 print(f"\n[*] Final PIN: {pin}")
 ```
-================================================================================
-WHY KRAMPUS FAILED (AGAIN)
-================================================================================
+### WHY KRAMPUS FAILED (AGAIN)
 
 The KRAMPUS Syndicate made several critical errors:
 
@@ -3284,9 +3131,7 @@ for i in range(6):
 result |= ord(user_input[i]) ˆ ord(real_pin[i])
 return result == 0 # Always checks all 6 digits
 ```
-================================================================================
-FINAL STATS
-================================================================================
+### FINAL STATS
 
 ```
 Attempts used: ̃47 out of 100
@@ -3295,9 +3140,7 @@ Elves rescued: 3 (Jingle, Tinsel, Sprocket)
 Candy canes left: 1 (Jingle was hoarding)
 KRAMPUS devs: Still employed somehow
 ```
-================================================================================
-REAL-WORLD IMPLICATIONS
-================================================================================
+### REAL-WORLD IMPLICATIONS
 
 Timing attacks are EVERYWHERE:
 
@@ -3315,9 +3158,7 @@ This is why security-critical code needs:
 - Timing-safe crypto libraries
 - Code review by people who know about side channels
 
-================================================================================
-CLOSING THOUGHTS
-================================================================================
+### CLOSING THOUGHTS
 
 The elves are safe. The elevator is working. KRAMPUS Syndicate is probably
 already planning their next poorly-secured intrusion.
@@ -3337,9 +3178,7 @@ Flag: csd{T1m1n9_T1M1N9_t1M1n9_1t5_4LL_480UT_tH3_t1m1n9}
 
 It really is all about the timing.
 
-================================================================================
-GG WP
-================================================================================
+### GG WP
 
 
 ## 18. What happens to the response time when you get the first digit right?
@@ -3557,18 +3396,13 @@ csd{T1m1n9_T1M1N9_t1M1n9_1t5_4LL_480UT_tH3_t1m1n9}
 
 *Source: writeups/TrustCTF_writeup.txt*
 
-### ================================================================================
 
 ### TRUST ISSUES CTF WRITEUP
 
 AWS IAM Privilege Escalation Challenge
-================================================================================
-
 FLAG: csd{sO_M4NY_VUln3R48L3_7H1Ngs_7H3S3_d4yS_s1gh_bc653}
 
-================================================================================
-CHALLENGE OVERVIEW
-================================================================================
+### CHALLENGE OVERVIEW
 
 KRAMPUS SYNDICATE got an operative hired as an external contractor at NPLD’s
 cloud infrastructure team. We were given minimal access credentials and needed
@@ -3584,9 +3418,7 @@ Challenge Details:
 Hint: "IAM policies can have multiple versions. If you can create a new
 version, you control what it permits."
 
-================================================================================
-SOLUTION STEPS
-================================================================================
+### SOLUTION STEPS
 
 STEP 1: Connect to the Custom AWS Endpoint
 ------------------------------------------
@@ -3713,9 +3545,7 @@ content = response[’Body’].read().decode(’utf-8’)
 print(content) # csd{sO_M4NY_VUln3R48L3_7H1Ngs_7H3S3_d4yS_s1gh_bc653}
 ```
 
-================================================================================
-COMPLETE SOLUTION CODE
-================================================================================
+### COMPLETE SOLUTION CODE
 
 ```python
 import boto3
@@ -3758,9 +3588,7 @@ flag = response[’Body’].read().decode(’utf-8’)
 print(f"FLAG: {flag}")
 ```
 
-================================================================================
-VULNERABILITY ANALYSIS
-================================================================================
+### VULNERABILITY ANALYSIS
 
 The IAM misconfiguration here was simple but critical:
 
@@ -3778,9 +3606,7 @@ In a real scenario, this could happen due to:
 - Lack of IAM policy review process
 - No automated scanning for overly permissive policies
 
-================================================================================
-ALTERNATIVE APPROACH (If admin policy wasn’t present)
-================================================================================
+### ALTERNATIVE APPROACH (If admin policy wasn’t present)
 
 Based on the hint about IAM policy versions, if privilege escalation
 was actually required, the attack path would be:
@@ -3793,9 +3619,7 @@ was actually required, the attack path would be:
 This works because IAM policies support up to 5 versions, and whoever
 can create versions controls what the policy permits.
 
-================================================================================
-KEY TAKEAWAYS
-================================================================================
+### KEY TAKEAWAYS
 
 
 1. ENUMERATE EVERYTHING - Always check ALL policies (inline + attached)
@@ -3807,14 +3631,10 @@ KEY TAKEAWAYS
 4. POLICY AUDITING - Regular reviews of IAM policies can catch these
     issues before exploitation
 
-================================================================================
-FLAG TRANSLATION
-================================================================================
+### FLAG TRANSLATION
 
 csd{sO_M4NY_VUln3R48L3_7H1Ngs_7H3S3_d4yS_s1gh_bc653}
 
 "So many vulnerable things these days, sigh"
 
-================================================================================
-END OF WRITEUP
-================================================================================
+### END OF WRITEUP
