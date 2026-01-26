@@ -777,8 +777,66 @@ From Float - Method
 
 ---
 
-##Slithering Bytes
+## Slithering Bytes
+<img width="2078" height="467" alt="image" src="https://github.com/user-attachments/assets/e093013b-866d-4499-ab3b-790a376ba642" />
+**Solution**
+Hints the Snake language to be python - therefore we can find a way to convert it back 
 
+
+<img width="2228" height="1196" alt="image" src="https://github.com/user-attachments/assets/48fb2ca4-dd35-4686-956b-25935407967c" />
+Tool used:
+[https://www.codeconvert.ai/assembly-to-python-converter?id=3113759f-413e-4fcc-a813-a81c03b24663](https://www.codeconvert.ai/assembly-to-python-converter?id=3113759f-413e-4fcc-a813-a81c03b24663)
+
+
+Code:
+```
+def check_flag(flag):
+    if len(flag) != 30:
+        return False
+
+    p2 = [208, 212, 225, 206, 219, 222, 234, 219, 193, 208, 215, 193, 214, 209, 200]
+    p1 = [110, 87, 96, 101, 80, 66, 70, 74, 124, 75, 124, 90, 70, 76, 70]
+
+    for i in range(1, len(flag) // 2):
+        if (ord(flag[i]) ^ 181) != p2[i // 2]:
+            return False
+
+    for i in range(0, len(flag) // 2):
+        if (ord(flag[i]) ^ 35) != p1[i // 2]:
+            return False
+
+    # If all checks pass, function implicitly returns None (or True if you want to be explicit)
+
+```
+
+1) The flag length is fixed at 30. The two lists each hold 15 values, hinting that even
+   and odd indices are handled separately.
+2) First loop: for i in range(1, len(flag)//2), it checks (ord(flag[i]) ^ 181) == p2[i//2].
+   This maps odd positions (1,3,5,...) because index starts at 1. So, the character for
+   index 2*k+1 is p2[k] ^ 181.
+3) Second loop: for i in range(0, len(flag)//2), it checks (ord(flag[i]) ^ 35) == p1[i//2].
+   This maps even positions (0,2,4,...) because index starts at 0. So, the character for
+   index 2*k is p1[k] ^ 35.
+4) Decode both halves and interleave:
+   flag[2*k]   = chr(p1[k] ^ 35)
+   flag[2*k+1] = chr(p2[k] ^ 181)
+
+5) Doing that yields the flag.
+
+```
+p1 = [110, 87, 96, 101, 80, 66, 70, 74, 124, 75, 124, 90, 70, 76, 70]
+p2 = [208, 212, 225, 206, 219, 222, 234, 219, 193, 208, 215, 193, 214, 209, 200]
+
+flag = ["?"] * 30
+for i, v in enumerate(p1):
+    flag[2 * i] = chr(v ^ 35)       # even positions
+for i, v in enumerate(p2):
+    flag[2 * i + 1] = chr(v ^ 181)  # odd positions
+
+print("".join(flag))
+
+//Flag: MetaCTF{snake_in_the_bytecode}
+```
 
 ---
 
