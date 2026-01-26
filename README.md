@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="assets/style.css">
+
 <img width="1317" height="1151" alt="image" src="https://github.com/user-attachments/assets/d3ad0476-fb72-4f3c-911f-a252a45b3b45" />
 
 # Here are my Solutions to MetaCTF challenges
@@ -755,6 +757,27 @@ Using Audacity to play the raw file (files > import> raw data)
 <img width="2347" height="1057" alt="image" src="https://github.com/user-attachments/assets/95bfc01b-54f8-4b2f-a452-cb43eeee42d1" />
 
 The flag = MetaCTF{4_l1ttl3_b1rd_t0ld_m3}
+
+
+---
+
+# Meta CTF Flash Jan 2026 solutions
+## Floating
+
+```
+240600592 212.2753143310547 2.7884192016691608e+23 5.623021054185822e+31 17611451687157891000 8.927742989328635e-10 16391240070931153000 5.639361688736244e-8 2.115975377137147e-7
+```
+
+<img width="2081" height="461" alt="image" src="https://github.com/user-attachments/assets/0bd19c57-4b1e-46ff-a559-30fcfc74b27b" />
+
+Using CyberCheif
+From Float - Method
+
+<img width="1832" height="785" alt="image" src="https://github.com/user-attachments/assets/daaf3da2-422a-47ad-993e-48b06608c4e5" />
+
+---
+
+##Slithering Bytes
 
 
 ---
