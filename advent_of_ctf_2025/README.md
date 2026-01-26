@@ -33,7 +33,7 @@ Some challenges include supplemental notes or raw session logs; those appear as 
 
 ## 1. Custom Packaging CTF Writeup
 
-*Source: writeups/Custom_packagingctf_writeup.txt*
+*Source: writeups/custom-packaging-ctf.txt*
 
 
 ### CUSTOM PACKAGING CTF WRITEUP
@@ -152,23 +152,22 @@ Translation: "Krampus really likes to make everything custom"
 ### SOLUTION CODE
 
 ```python
-import struct
 import hashlib
-from arc4 import ARC
-import os
 import re
+import struct
+from arc4 import ARC4
 
-with open(’ks_operations.kcf’, ’rb’) as f:
-data = f.read()
+with open("ks_operations.kcf", "rb") as f:
+    data = f.read()
+
+FAT_OFFSET = 0x80
+DATA_OFFSET = 0x4000
 
 # Parse header
 nonce = data[0x08:0x18]
 timestamp_le = data[0x18:0x20]
 file_count_le = data[0x20:0x22]
-file_count = struct.unpack(’<H’, file_count_le)[0]
-
-FAT_OFFSET = 0x
-DATA_OFFSET = 0x
+file_count = struct.unpack("<H", file_count_le)[0]
 
 # Master key derivation (HINT 1)
 identifier = b"ks2025"
@@ -178,36 +177,29 @@ master_key = hashlib.sha256(master_key_material).digest()
 # Decrypt FAT
 fat_size = file_count * 96
 fat_enc = data[FAT_OFFSET:FAT_OFFSET + fat_size]
-cipher = ARC4(master_key)
-fat_dec = cipher.decrypt(fat_enc)
+fat_dec = ARC4(master_key).encrypt(fat_enc)  # ARC4 encrypt/decrypt are symmetric
 
 # Parse FAT entries and extract files
 for i in range(file_count):
-entry = fat_dec[i*96:(i+1)*96]
-offset = struct.unpack(’<I’, entry[4:8])[0]
-size = struct.unpack(’<I’, entry[12:16])[0]
+    entry = fat_dec[i * 96 : (i + 1) * 96]
+    offset = struct.unpack("<I", entry[4:8])[0]
+    size = struct.unpack("<I", entry[12:16])[0]
 
-```
-# Per-file key derivation (HINT 2)
-idx_bytes = struct.pack(’<I’, i)
-off_bytes = struct.pack(’<Q’, offset)
-file_key = hashlib.sha256(master_key + idx_bytes + off_bytes).digest()[:16]
-```
-```
-# Decrypt file
-start = DATA_OFFSET + offset
-enc_data = data[start:start + size]
-cipher = ARC4(file_key)
-dec_data = cipher.decrypt(enc_data)
-```
-```
-# Search for flag
-```
+    # Per-file key derivation (HINT 2)
+    idx_bytes = struct.pack("<I", i)
+    off_bytes = struct.pack("<Q", offset)
+    file_key = hashlib.sha256(master_key + idx_bytes + off_bytes).digest()[:16]
 
-if b’csd{’ in dec_data:
-match = re.search(rb’csd\{[ˆ}]+\}’, dec_data)
-if match:
-print(f"FLAG: {match.group().decode()}")
+    # Decrypt file
+    start = DATA_OFFSET + offset
+    enc_data = data[start : start + size]
+    dec_data = ARC4(file_key).encrypt(enc_data)
+
+    # Search for flag
+    if b"csd{" in dec_data:
+        match = re.search(rb"csd\\{[^}]+\\}", dec_data)
+        if match:
+            print(f"FLAG: {match.group().decode()}")
 ```
 
 ### KEY TAKEAWAYS
@@ -226,7 +218,7 @@ print(f"FLAG: {match.group().decode()}")
 
 ## 2. Drone Control (Reverse / Network)
 
-*Source: writeups/Drone_hunt_writeup.txt*
+*Source: writeups/drone-hunt-writeup.txt*
 
 ```
 Challenge: Drone Control (Reverse / Network)
@@ -259,7 +251,7 @@ csd{h00r4y_now_U_h4v3_a_dr0ne_army_5846a7b30c}
 
 ## 3. NPLD Mainframe Authentication -- Reverse Engineering Write-Up
 
-*Source: writeups/Elfs_writeup.txt*
+*Source: writeups/elfs-writeup.txt*
 
 NPLD Mainframe Authentication -- Reverse Engineering Write-Up
 Challenge Overview
@@ -416,7 +408,7 @@ csd{1nt0_th3_m41nfr4m3}
 
 ## 4. Failed_Exfil Write-up (Format String -> Recover Admin Code -> Dump Metadata)
 
-*Source: writeups/Failed_Exfil_Writeup.txt*
+*Source: writeups/failed-exfil-summary.txt*
 
 Failed_Exfil Write-up (Format String -> Recover Admin Code -> Dump Metadata)
 Summary
@@ -590,7 +582,7 @@ admin -> enter decimal -> print metadata
 
 ## 5. Krampus Syndicate’s Failed Exfil Service
 
-*Source: writeups/FailedExfil.txt*
+*Source: writeups/failed-exfil-service.txt*
 
 
 ### KRAMPUS SYNDICATE’S FAILED EXFIL SERVICE
@@ -803,7 +795,7 @@ Thanks for the challenge! Merry KRAMPUS!
 
 ## 6. Frostbyte CTF Challenge Writeup
 
-*Source: writeups/frostbyte_writeup.txt*
+*Source: writeups/frostbyte-writeup.txt*
 
 Frostbyte CTF Challenge Writeup
 
@@ -900,7 +892,7 @@ Author’s Note (from flag.txt)
 
 ## 7. Packet Tracer - Activity Grader
 
-*Source: writeups/HolidayWriting_writeup.txt*
+*Source: writeups/holiday-writing-writeup.txt*
 
 Packet Tracer - Activity Grader
 Network Configuration & Hardening Write-Up
@@ -1090,7 +1082,7 @@ Tool Used: Cisco Packet Tracer v9.0.0
 
 ## 8. Image Security Walkthrough (86/100)
 
-*Source: writeups/Image Security.txt*
+*Source: writeups/image-security.txt*
 
 ```
 Image Security Walkthrough (86/100)
@@ -1323,7 +1315,7 @@ Humor Footnote
 
 ## 9. Jingle’s Validator
 
-*Source: writeups/Jingle's Validator.txt*
+*Source: writeups/jingles-validator.txt*
 
 
 ### JINGLE’S VALIDATOR
@@ -1772,7 +1764,7 @@ Snowdrift sends their regards.
 
 ## 10. Kramazon - Santa Priority (Auth Cookie Bypass)
 
-*Source: writeups/karmazon_wrtieup.txt*
+*Source: writeups/kramazon-writeup.txt*
 
 Kramazon - Santa Priority (Auth Cookie Bypass)
 Challenge Summary
@@ -1934,7 +1926,7 @@ Flag
 
 ## 11. KDNU-3B Firmware HACK Writeup
 
-*Source: writeups/KDNU-3B.txt*
+*Source: writeups/kdnu-3b.txt*
 
 
 ### KDNU-3B FIRMWARE HACK WRITEUP
@@ -2081,7 +2073,7 @@ Written with love and caffeine
 
 ## 12. Jingle’s "unbreakable" Crypto
 
-*Source: writeups/LogFolly.txt*
+*Source: writeups/log-folly.txt*
 
 
 ### JINGLE’S "UNBREAKABLE" CRYPTO
@@ -2310,7 +2302,7 @@ Thanks Jingle! Your "real cryptography" was very educational!
 
 ## 13. Multifactorial CTF Write-up (csd.lol)
 
-*Source: writeups/multifactorial_writeup.txt*
+*Source: writeups/multifactorial-writeup.txt*
 
 ```
 Multifactorial CTF Write-up (csd.lol)
@@ -2443,7 +2435,7 @@ Root causes & mitigations
 
 ## 14. Re-Key-very - Cryptography Challenge Writeup
 
-*Source: writeups/Re-Key-very.txt*
+*Source: writeups/re-key-very.txt*
 
 Re-Key-very - Cryptography Challenge Writeup
 
@@ -2550,7 +2542,7 @@ Key Insights:
 
 ## 15. Krampus DNS Shenanigans - How I Got the Flag
 
-*Source: writeups/Syndicate.txt*
+*Source: writeups/syndicate.txt*
 
 Krampus DNS Shenanigans - How I Got the Flag
 
@@ -2689,7 +2681,7 @@ End of suffering.
 
 ## 16. Syndiware - Forensics Challenge Writeup
 
-*Source: writeups/Syndiware.txt*
+*Source: writeups/syndiware.txt*
 
 Syndiware - Forensics Challenge Writeup
 
@@ -2839,7 +2831,7 @@ Key Insights:
 
 ## 17. TIME TO Escalate
 
-*Source: writeups/Time To Escalate.txt*
+*Source: writeups/time-to-escalate-guide.txt*
 
 
 ### TIME TO ESCALATE
@@ -3183,7 +3175,7 @@ It really is all about the timing.
 
 ## 18. What happens to the response time when you get the first digit right?
 
-*Source: writeups/Time_to_Escalate.txt*
+*Source: writeups/time-to-escalate-timing.txt*
 
 ```
 The validator checks digits one at a time.
@@ -3394,7 +3386,7 @@ csd{T1m1n9_T1M1N9_t1M1n9_1t5_4LL_480UT_tH3_t1m1n9}
 
 ## 19. Trust Issues CTF Writeup
 
-*Source: writeups/TrustCTF_writeup.txt*
+*Source: writeups/trust-ctf-writeup.txt*
 
 
 ### TRUST ISSUES CTF WRITEUP

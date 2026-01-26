@@ -60,7 +60,7 @@ Trust Issues CTF Writeup
 .NH 1
 Custom Packaging CTF Writeup
 .PP
-\fISource\fP: Custom_packagingctf_writeup.txt
+\fISource\fP: custom-packaging-ctf.txt
 .PP
 .nf
 .ft C
@@ -274,7 +274,7 @@ KEY TAKEAWAYS
 .NH 1
 Drone Control (Reverse / Network)
 .PP
-\fISource\fP: Drone_hunt_writeup.txt
+\fISource\fP: drone-hunt-writeup.txt
 .PP
 .nf
 .ft C
@@ -313,7 +313,7 @@ csd{h00r4y_now_U_h4v3_a_dr0ne_army_5846a7b30c}
 .NH 1
 NPLD Mainframe Authentication -- Reverse Engineering Write-Up
 .PP
-\fISource\fP: Elfs_writeup.txt
+\fISource\fP: elfs-writeup.txt
 .PP
 .nf
 .ft C
@@ -484,7 +484,7 @@ csd{1nt0_th3_m41nfr4m3}
 .NH 1
 Failed_Exfil Write-up (Format String -> Recover Admin Code -> Dump Metadata)
 .PP
-\fISource\fP: Failed_Exfil_Writeup.txt
+\fISource\fP: failed-exfil-summary.txt
 .PP
 .nf
 .ft C
@@ -676,7 +676,7 @@ admin -> enter decimal -> print metadata
 .NH 1
 Krampus Syndicate's Failed Exfil Service
 .PP
-\fISource\fP: FailedExfil.txt
+\fISource\fP: failed-exfil-service.txt
 .PP
 .nf
 .ft C
@@ -902,7 +902,7 @@ Thanks for the challenge! Merry KRAMPUS!
 .NH 1
 Frostbyte CTF Challenge Writeup
 .PP
-\fISource\fP: frostbyte_writeup.txt
+\fISource\fP: frostbyte-writeup.txt
 .PP
 .nf
 .ft C
@@ -996,7 +996,7 @@ Author's Note (from flag.txt)
 .NH 1
 Packet Tracer - Activity Grader
 .PP
-\fISource\fP: HolidayWriting_writeup.txt
+\fISource\fP: holiday-writing-writeup.txt
 .PP
 .nf
 .ft C
@@ -1191,7 +1191,7 @@ Tool Used: Cisco Packet Tracer v9.0.0
 .NH 1
 Image Security Walkthrough (86/100)
 .PP
-\fISource\fP: Image Security.txt
+\fISource\fP: image-security.txt
 .PP
 .nf
 .ft C
@@ -1381,7 +1381,7 @@ Humor Footnote
 .NH 1
 Jingle's Validator
 .PP
-\fISource\fP: Jingle's Validator.txt
+\fISource\fP: jingles-validator.txt
 .PP
 .nf
 .ft C
@@ -1818,7 +1818,7 @@ Snowdrift sends their regards.
 .NH 1
 Kramazon - Santa Priority (Auth Cookie Bypass)
 .PP
-\fISource\fP: karmazon_wrtieup.txt
+\fISource\fP: kramazon-writeup.txt
 .PP
 .nf
 .ft C
@@ -1998,7 +1998,7 @@ Flag
 .NH 1
 KDNU-3B Firmware HACK Writeup
 .PP
-\fISource\fP: KDNU-3B.txt
+\fISource\fP: kdnu-3b.txt
 .PP
 .nf
 .ft C
@@ -2153,7 +2153,7 @@ Written with love and caffeine
 .NH 1
 Jingle's "unbreakable" Crypto
 .PP
-\fISource\fP: LogFolly.txt
+\fISource\fP: log-folly.txt
 .PP
 .nf
 .ft C
@@ -2388,7 +2388,7 @@ Thanks Jingle! Your "real cryptography" was very educational!
 .NH 1
 Multifactorial CTF Write-up (csd.lol)
 .PP
-\fISource\fP: multifactorial_writeup.txt
+\fISource\fP: multifactorial-writeup.txt
 .PP
 .nf
 .ft C
@@ -2516,7 +2516,7 @@ Root causes & mitigations
 .NH 1
 Re-Key-very - Cryptography Challenge Writeup
 .PP
-\fISource\fP: Re-Key-very.txt
+\fISource\fP: re-key-very.txt
 .PP
 .nf
 .ft C
@@ -2626,7 +2626,7 @@ Key Insights:
 .NH 1
 Krampus DNS Shenanigans - How I Got the Flag
 .PP
-\fISource\fP: Syndicate.txt
+\fISource\fP: syndicate.txt
 .PP
 .nf
 .ft C
@@ -2761,7 +2761,7 @@ End of suffering.
 .NH 1
 Syndiware - Forensics Challenge Writeup
 .PP
-\fISource\fP: Syndiware.txt
+\fISource\fP: syndiware.txt
 .PP
 .nf
 .ft C
@@ -2901,7 +2901,7 @@ Key Insights:
 .NH 1
 TIME TO Escalate
 .PP
-\fISource\fP: Time To Escalate.txt
+\fISource\fP: time-to-escalate-guide.txt
 .PP
 .nf
 .ft C
@@ -3239,7 +3239,7 @@ It really is all about the timing.
 .NH 1
 What happens to the response time when you get the first digit right?
 .PP
-\fISource\fP: Time_to_Escalate.txt
+\fISource\fP: time-to-escalate-timing.txt
 .PP
 .nf
 .ft C
@@ -3455,7 +3455,7 @@ csd{T1m1n9_T1M1N9_t1M1n9_1t5_4LL_480UT_tH3_t1m1n9}
 .NH 1
 Trust Issues CTF Writeup
 .PP
-\fISource\fP: TrustCTF_writeup.txt
+\fISource\fP: trust-ctf-writeup.txt
 .PP
 .nf
 .ft C

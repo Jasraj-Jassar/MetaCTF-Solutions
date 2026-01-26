@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="assets/style.css">
-
 <img width="1317" height="1151" alt="image" src="https://github.com/user-attachments/assets/d3ad0476-fb72-4f3c-911f-a252a45b3b45" />
 
 # Here are my Solutions to MetaCTF challenges
@@ -48,7 +46,7 @@ CTFs are amazing!
 ---
 
 ## More Competitions
-- [MetaCTF December 2025 Flash CTF](metactf_dec25_flash_ctf/Readme.md)
+- [MetaCTF December 2025 Flash CTF](metactf_dec25_flash_ctf/README.md)
 - [Advent of CTF 2025 Writeup Compendium](advent_of_ctf_2025/README.md)
 
 ---
@@ -65,7 +63,7 @@ Many thanks to the MetaCTF team for providing high-quality, freely accessible le
 
 ---
 
-Solved: (all writeups might not be availble as i did some with friends and didnt to take notes)
+Solved (some writeups are missing because I solved a few with friends and didn't take notes):
 
 | Points | Challenges |
 | --- | --- |
@@ -100,7 +98,7 @@ Meaning adding `/employee_portal.php` to the URL takes you there.
 
 ## Camping Adventure
 
-![image.png](images/image%201.png)
+![image.png](images/image-01.png)
 
 **Solution**
 Perform Google Image Search.
@@ -111,7 +109,7 @@ Perform Google Image Search.
 
 ## Architecture Astronaut
 
-![image.png](images/image%202.png)
+![image.png](images/image-02.png)
 
 [this executable](https://metaproblems.com/d36b89698928224c03f29aa2d2cb5544/astronaut)
 
@@ -145,7 +143,7 @@ Flag: xtensa
 
 ## Anonymoose
 
-![image.png](images/image%203.png)
+![image.png](images/image-03.png)
 
 [Here's the letter in question.](https://metaproblems.com/0778e85952c806a4f55fb61d12fd8ca0/D34DM0053_Open_Letter_Mental_Health.pdf)
 
@@ -161,9 +159,9 @@ Downloaded the PDF - Viewed its MetaData using the following website:
 
 ## Wheel of Mystery
 
-![image.png](images/image%204.png)
+![image.png](images/image-04.png)
 
-![image.png](images/image%205.png)
+![image.png](images/image-05.png)
 
 **Solution**
 
@@ -197,7 +195,7 @@ METACTF{WHEELYCOOL}
 
 [Problem link](https://compete.metactf.com/289/problems#problem39)
 
-![image.png](images/image%206.png)
+![image.png](images/image-06.png)
 
 [here](http://host5.metaproblems.com:7510/)
 
@@ -205,7 +203,7 @@ METACTF{WHEELYCOOL}
 
 Went to the Script and found the Code
 
-![image.png](images/image%207.png)
+![image.png](images/image-07.png)
 
 
 ---
@@ -213,7 +211,7 @@ Went to the Script and found the Code
 
 ## Stack Smashers
 
-![image.png](images/image%208.png)
+![image.png](images/image-08.png)
 
 [here](http://e62fc65240.chals.mctf.io/).
 
@@ -229,7 +227,7 @@ Learn more about buffer overflows from the classic paper [Smashing the Stack fo
 
 ## runCAPTCHA
 
-![image.png](images/image%209.png)
+![image.png](images/image-09.png)
 
 [Here's](https://metaproblems.com/3bd33118c7a7faa98c23c76ea8aa782e/) the link to the initial infection page
 
@@ -272,7 +270,7 @@ It is a Windows **built-in executable** (`mshta.exe`) used to run **HTML Applica
 
 ## Slithering Security
 
-![image.png](images/image%2010.png)
+![image.png](images/image-10.png)
 
 [here.](https://metaproblems.com/e7d6901a6cde126e0c211b60d216aedd/chal.py)
 
@@ -284,7 +282,7 @@ b"\x54\x57\x56\x30\x59\x55\x4e\x55\x52\x6e\x74\x6b\x4d\x47\x34\x33\x58\x7a\x64\x
 
 Was given this string in HEX
 
-![image.png](images/image%2011.png)
+![image.png](images/image-11.png)
 
 - From Hex (auto delimiters)
 - From Base64
@@ -297,7 +295,7 @@ Flag Captured!
 
 ## Abashed Confessions
 
-![image.png](images/image%2012.png)
+![image.png](images/image-12.png)
 
 We also have a transcript of the letter [here](https://metaproblems.com/e50c3885d7512ce80354b2583d204365/letter_transcript.txt).
 
